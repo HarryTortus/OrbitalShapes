@@ -1,44 +1,61 @@
 let shapes = [];
 let sliderA, sliderB, sliderC, sizeSlider;
 let sliderContainer, buttonContainer;
-let versionNumber = "0.05"; // Change this for version updates
+let versionNumber = "0.06"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    frameRate(60); // Increased frame rate for smoother motion
+    frameRate(30); // Slower motion by default
     background(0);
     
     // Remove default margins and padding to prevent scrollbars
     document.body.style.margin = "0";
     document.body.style.overflow = "hidden";
     
-    // Create sliders at the bottom of the screen with a gray border and larger size
+    // Create a full-width bottom control bar
     sliderContainer = createDiv('').style('position', 'absolute')
-                                     .style('bottom', '10px')
-                                     .style('left', '50%')
-                                     .style('transform', 'translateX(-50%)')
-                                     .style('padding', '20px')
+                                     .style('bottom', '0')
+                                     .style('left', '0')
+                                     .style('width', '100%')
+                                     .style('padding', '10px')
                                      .style('background', '#888')
-                                     .style('border-radius', '10px');
+                                     .style('display', 'flex')
+                                     .style('justify-content', 'center')
+                                     .style('align-items', 'center');
     
     sliderA = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
     sliderB = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
     sliderC = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
     sizeSlider = createSlider(10, min(windowWidth, windowHeight) * 0.75, 50).style('width', '150px').style('height', '20px').parent(sliderContainer);
     
-    // Create shape selection buttons
-    buttonContainer = createDiv('').style('position', 'absolute')
-                                   .style('top', '10px')
-                                   .style('left', '50%')
-                                   .style('transform', 'translateX(-50%)')
-                                   .style('padding', '10px')
-                                   .style('background', '#888')
-                                   .style('border-radius', '10px');
+    // Create shape selection buttons as shapes
+    buttonContainer = createDiv('').style('display', 'flex')
+                                   .style('gap', '10px')
+                                   .style('margin-left', '20px')
+                                   .parent(sliderContainer);
     
-    createButton('Circle').mousePressed(() => selectedShape = 'circle').parent(buttonContainer);
-    createButton('Square').mousePressed(() => selectedShape = 'square').parent(buttonContainer);
-    createButton('Triangle').mousePressed(() => selectedShape = 'triangle').parent(buttonContainer);
+    createButton('').mousePressed(() => selectedShape = 'circle')
+                  .style('width', '30px')
+                  .style('height', '30px')
+                  .style('background', 'black')
+                  .style('border-radius', '50%')
+                  .parent(buttonContainer);
+    
+    createButton('').mousePressed(() => selectedShape = 'square')
+                  .style('width', '30px')
+                  .style('height', '30px')
+                  .style('background', 'black')
+                  .style('border', '2px solid white')
+                  .parent(buttonContainer);
+    
+    createButton('').mousePressed(() => selectedShape = 'triangle')
+                  .style('width', '0')
+                  .style('height', '0')
+                  .style('border-left', '15px solid transparent')
+                  .style('border-right', '15px solid transparent')
+                  .style('border-bottom', '30px solid black')
+                  .parent(buttonContainer);
 }
 
 function draw() {
@@ -60,7 +77,7 @@ function windowResized() {
 
 function mousePressed() {
     // Prevent shapes from being added when clicking on sliders or buttons
-    if (mouseY < height - 70 && mouseY > 50) { // Adjusted to ensure space for UI
+    if (mouseY < height - 50) { // Ensure space for UI
         let s = new Shape(mouseX, mouseY, selectedShape); // Shapes spawn where clicked
         shapes.push(s);
     }
@@ -78,8 +95,8 @@ class Shape {
         let a = sliderA.value();
         let b = sliderB.value();
         let c = sliderC.value();
-        this.x += sin(frameCount * 0.1 * a) * b; // Increased motion speed
-        this.y += cos(frameCount * 0.1 * b) * c;
+        this.x += sin(frameCount * 0.05 * a) * b; // Slower motion
+        this.y += cos(frameCount * 0.05 * b) * c;
     }
     display() {
         fill(this.color);
@@ -96,3 +113,4 @@ class Shape {
         }
     }
 }
+
