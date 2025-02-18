@@ -1,7 +1,7 @@
 let shapes = [];
 let sliderA, sliderB, sliderC, sizeSlider;
 let sliderContainer, buttonContainer;
-let versionNumber = "0.09d"; // Change this for version updates
+let versionNumber = "0.10"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 
 function setup() {
@@ -31,7 +31,7 @@ function setup() {
                                      .style('flex-direction', 'column')
                                      .style('align-items', 'center')
                                      .parent(sliderContainer);
-        let slider = createSlider(min, max, defaultValue, 0.1).style('width', '150px').style('height', '20px').style('background', '#3fd16b').style('accent-color', '#3fd16b').parent(container);
+        let slider = createSlider(min, max, defaultValue, 0.1).style('width', '150px').style('height', '20px').style('background', 'olive').style('accent-color', 'olive').parent(container);
         createSpan(labelText).style('color', 'white').parent(container);
         return slider;
     }
@@ -104,27 +104,34 @@ class Shape {
         this.size = sizeSlider.value();
         this.color = color(random(255), random(255), random(255));
         this.type = type;
+        this.rotation = random(TWO_PI);
+        this.xSpeed = random(-2, 2);
+        this.ySpeed = random(-2, 2);
     }
     update() {
         let a = sliderA.value();
         let b = sliderB.value();
         let c = sliderC.value();
-        this.x += sin(frameCount * 0.05 * a) * b; // Slower motion
-        this.y += cos(frameCount * 0.05 * b) * c;
+        this.x += this.xSpeed + sin(frameCount * 0.05 * a) * b; // Slower motion
+        this.y += this.ySpeed + cos(frameCount * 0.05 * b) * c;
     }
     display() {
+        push();
+        translate(this.x, this.y);
+        rotate(this.rotation);
         fill(this.color);
         noStroke();
         if (this.type === 'circle') {
-            ellipse(this.x, this.y, this.size);
+            ellipse(0, 0, this.size);
         } else if (this.type === 'square') {
             rectMode(CENTER);
-            rect(this.x, this.y, this.size, this.size);
+            rect(0, 0, this.size, this.size);
         } else if (this.type === 'triangle') {
-            triangle(this.x, this.y - this.size / 2, 
-                     this.x - this.size / 2, this.y + this.size / 2, 
-                     this.x + this.size / 2, this.y + this.size / 2);
+            triangle(0, -this.size / 2, 
+                     -this.size / 2, this.size / 2, 
+                     this.size / 2, this.size / 2);
         }
+        pop();
     }
 }
 
