@@ -33,11 +33,11 @@ function setup() {
                             motionActive = !motionActive;
                             motionButton.html(motionActive ? '⏸' : '▶');
                         })
-                        .style('width', '30px')
-                        .style('height', '30px')
+                        .style('width', '40px')
+                        .style('height', '40px')
                         .style('background', '#888')
                         .style('color', '#3fd16b')
-                        .style('font-size', '20px')
+                        .style('font-size', '30px')
                         .style('border', 'none')
                         .style('cursor', 'pointer')
                         .parent(leftControls);
