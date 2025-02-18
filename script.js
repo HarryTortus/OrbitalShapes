@@ -171,7 +171,7 @@ class Shape {
         this.velY = random(-2, 2);
         this.color = color(random(255), random(255), random(255));
         this.rotation = random(360);
-        this.rotationSpeed = random(-2, 2);
+        this.rotationSpeed = random(-.1, .1);
     }
 
     updateMass() {
