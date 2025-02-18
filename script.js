@@ -1,7 +1,7 @@
 let shapes = [];
 let sliderA, sliderB, sliderC, sizeSlider;
 let sliderContainer, buttonContainer;
-let versionNumber = "0.09c"; // Change this for version updates
+let versionNumber = "0.09d"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 
 function setup() {
@@ -31,7 +31,7 @@ function setup() {
                                      .style('flex-direction', 'column')
                                      .style('align-items', 'center')
                                      .parent(sliderContainer);
-        let slider = createSlider(min, max, defaultValue, 0.1).style('width', '150px').style('height', '20px').style('background', 'olive').parent(container);
+        let slider = createSlider(min, max, defaultValue, 0.1).style('width', '150px').style('height', '20px').style('background', 'olive').style('accent-color', 'olive').parent(container);
         createSpan(labelText).style('color', 'white').parent(container);
         return slider;
     }
@@ -63,12 +63,12 @@ function setup() {
                   .parent(buttonContainer);
     
     createButton('').mousePressed(() => selectedShape = 'triangle')
-                  .style('width', '0')
-                  .style('height', '0')
-                  .style('border-left', '15px solid transparent')
-                  .style('border-right', '15px solid transparent')
-                  .style('border-bottom', '30px solid black')
-                  .style('border-radius', 'none')
+                  .style('width', '30px')
+                  .style('height', '30px')
+                  .style('background', 'transparent')
+                  .style('clip-path', 'polygon(50% 0%, 0% 100%, 100% 100%)')
+                  .style('background-color', 'black')
+                  .style('border', 'none')
                   .parent(buttonContainer);
 }
 
