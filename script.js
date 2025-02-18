@@ -4,7 +4,12 @@ let sliderContainer;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
+    noLoop();
     background(0);
+    
+    // Remove default margins and padding to prevent scrollbars
+    document.body.style.margin = "0";
+    document.body.style.overflow = "hidden";
     
     // Create sliders at the bottom of the screen with a gray border and larger size
     sliderContainer = createDiv('').style('position', 'absolute')
@@ -27,6 +32,10 @@ function draw() {
         shape.update();
         shape.display();
     }
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
 }
 
 function mousePressed() {
