@@ -1,7 +1,8 @@
 let shapes = [];
-let sliderA, sliderB, sliderC;
-let sliderContainer;
-let versionNumber = "0.02"; // Change this for version updates
+let sliderA, sliderB, sliderC, sizeSlider;
+let sliderContainer, buttonContainer;
+let versionNumber = "0.03"; // Change this for version updates
+let selectedShape = 'circle'; // Default shape
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -24,6 +25,20 @@ function setup() {
     sliderA = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
     sliderB = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
     sliderC = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
+    sizeSlider = createSlider(10, min(windowWidth, windowHeight) * 0.75, 50).style('width', '150px').style('height', '20px').parent(sliderContainer);
+    
+    // Create shape selection buttons
+    buttonContainer = createDiv('').style('position', 'absolute')
+                                   .style('top', '10px')
+                                   .style('left', '50%')
+                                   .style('transform', 'translateX(-50%)')
+                                   .style('padding', '10px')
+                                   .style('background', '#888')
+                                   .style('border-radius', '10px');
+    
+    createButton('Circle').mousePressed(() => selectedShape = 'circle').parent(buttonContainer);
+    createButton('Square').mousePressed(() => selectedShape = 'square').parent(buttonContainer);
+    createButton('Triangle').mousePressed(() => selectedShape = 'triangle').parent(buttonContainer);
 }
 
 function draw() {
@@ -44,12 +59,44 @@ function windowResized() {
 }
 
 function mousePressed() {
-    // Prevent shapes from being added when clicking on sliders
-    if (mouseY < height - 70) { // Adjusted to ensure space for sliders
-        let s = new Shape(mouseX, mouseY); // Shapes spawn where clicked
+    // Prevent shapes from being added when clicking on sliders or buttons
+    if (mouseY < height - 70 && mouseY > 50) { // Adjusted to ensure space for UI
+        let s = new Shape(mouseX, mouseY, selectedShape); // Shapes spawn where clicked
         shapes.push(s);
     }
 }
+
+class Shape {
+    constructor(x, y, type) {
+        this.x = x;
+        this.y = y;
+        this.size = sizeSlider.value();
+        this.color = color(random(255), random(255), random(255));
+        this.type = type;
+    }
+    update() {
+        let a = sliderA.value();
+        let b = sliderB.value();
+        let c = sliderC.value();
+        this.x += sin(frameCount * 0.01 * a) * b;
+        this.y += cos(frameCount * 0.01 * b) * c;
+    }
+    display() {
+        fill(this.color);
+        noStroke();
+        if (this.type === 'circle') {
+            ellipse(this.x, this.y, this.size);
+        } else if (this.type === 'square') {
+            rectMode(CENTER);
+            rect(this.x, this.y, this.size, this.size);
+        } else if (this.type === 'triangle') {
+            triangle(this.x, this.y - this.size / 2, 
+                     this.x - this.size / 2, this.y + this.size / 2, 
+                     this.x + this.size / 2, this.y + this.size / 2);
+        }
+    }
+}
+
 
 class Shape {
     constructor(x, y) {
