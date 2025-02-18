@@ -4,7 +4,7 @@ let sliderContainer;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    noLoop();
+    frameRate(30); // Ensures continuous drawing
     background(0);
     
     // Remove default margins and padding to prevent scrollbars
