@@ -1,7 +1,7 @@
 let shapes = [];
 let sliderA, sliderB, sliderC;
 let sliderContainer;
-let versionNumber = 0.01; // Change this for version updates
+let versionNumber = "0.02"; // Change this for version updates
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -31,7 +31,7 @@ function draw() {
     
     fill(255);
     textSize(16);
-    text(`Version: ${versionNumber}`, 10, 20); // Display version in top-left corner
+    text(`Version: ${versionNumber}`, 10, 30); // Display version in top-left corner
     
     for (let shape of shapes) {
         shape.update();
@@ -45,8 +45,8 @@ function windowResized() {
 
 function mousePressed() {
     // Prevent shapes from being added when clicking on sliders
-    if (mouseY < height - 50) {
-        let s = new Shape(width / 2, height / 2); // Start movement in the middle
+    if (mouseY < height - 70) { // Adjusted to ensure space for sliders
+        let s = new Shape(mouseX, mouseY); // Shapes spawn where clicked
         shapes.push(s);
     }
 }
@@ -81,5 +81,3 @@ class Shape {
         }
     }
 }
-
-
