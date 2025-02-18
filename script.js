@@ -31,7 +31,7 @@ function setup() {
                                      .style('flex-direction', 'column')
                                      .style('align-items', 'center')
                                      .parent(sliderContainer);
-        let slider = createSlider(min, max, defaultValue, 0.1).style('width', '150px').style('height', '20px').style('background', 'olive').style('accent-color', 'olive').parent(container);
+        let slider = createSlider(min, max, defaultValue, 0.1).style('width', '150px').style('height', '20px').style('background', '#3fd16b').style('accent-color', '#3fd16b').parent(container);
         createSpan(labelText).style('color', 'white').parent(container);
         return slider;
     }
