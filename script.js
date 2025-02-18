@@ -1,10 +1,11 @@
 let shapes = [];
 let gravitySlider, lSystemSlider, collisionSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.22b"; // Updated version number
+let versionNumber = "0.22"; // Updated version number
 let selectedShape = 'circle'; 
 let motionActive = false; 
 const MAX_SHAPES = 100;
+let barHeight = 100;  // Adjust bar height for the full bottom area
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -18,6 +19,7 @@ function setup() {
                                     .style('bottom', '0')
                                     .style('left', '0')
                                     .style('width', '100%')
+                                    .style('height', barHeight + 'px')
                                     .style('padding', '10px')
                                     .style('background', '#888')
                                     .style('display', 'flex')
@@ -148,11 +150,11 @@ function windowResized() {
 }
 
 function mousePressed() {
-    // Prevent shapes from being placed on the bottom bar (adjusted click detection)
-    if (mouseY < height - 50 && mouseY > height - controlContainer.elt.clientHeight) {
-        return; // Prevent interaction with the bottom bar
+    // Block shape placement if mouse is clicking on the bar (full block including top part)
+    if (mouseY > height - barHeight) {
+        return; // Don't place shapes if clicking on the bar area
     }
-    
+
     if (shapes.length >= MAX_SHAPES) {
         shapes.shift(); // Remove the first shape if max limit is exceeded
     }
