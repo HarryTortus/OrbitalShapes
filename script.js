@@ -1,10 +1,11 @@
 let shapes = [];
 let sliderA, sliderB, sliderC;
 let sliderContainer;
+let versionNumber = 0.01; // Change this for version updates
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    frameRate(30); // Ensures continuous drawing
+    frameRate(30);
     background(0);
     
     // Remove default margins and padding to prevent scrollbars
@@ -27,6 +28,10 @@ function setup() {
 
 function draw() {
     background(0, 20); // Fading effect
+    
+    fill(255);
+    textSize(16);
+    text(`Version: ${versionNumber}`, 10, 20); // Display version in top-left corner
     
     for (let shape of shapes) {
         shape.update();
@@ -76,4 +81,5 @@ class Shape {
         }
     }
 }
+
 
