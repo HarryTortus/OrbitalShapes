@@ -1,7 +1,7 @@
 let shapes = [];
 let sliderA, sliderB, sliderC, sizeSlider;
 let sliderContainer, buttonContainer;
-let versionNumber = "0.06"; // Change this for version updates
+let versionNumber = "0.07"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 
 function setup() {
@@ -22,12 +22,20 @@ function setup() {
                                      .style('background', '#888')
                                      .style('display', 'flex')
                                      .style('justify-content', 'center')
-                                     .style('align-items', 'center');
+                                     .style('align-items', 'center')
+                                     .style('gap', '10px');
     
     sliderA = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
+    createSpan('Motion A').style('color', 'white').parent(sliderContainer);
+    
     sliderB = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
+    createSpan('Motion B').style('color', 'white').parent(sliderContainer);
+    
     sliderC = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
+    createSpan('Motion C').style('color', 'white').parent(sliderContainer);
+    
     sizeSlider = createSlider(10, min(windowWidth, windowHeight) * 0.75, 50).style('width', '150px').style('height', '20px').parent(sliderContainer);
+    createSpan('Size').style('color', 'white').parent(sliderContainer);
     
     // Create shape selection buttons as shapes
     buttonContainer = createDiv('').style('display', 'flex')
@@ -40,13 +48,14 @@ function setup() {
                   .style('height', '30px')
                   .style('background', 'black')
                   .style('border-radius', '50%')
+                  .style('border', 'none')
                   .parent(buttonContainer);
     
     createButton('').mousePressed(() => selectedShape = 'square')
                   .style('width', '30px')
                   .style('height', '30px')
                   .style('background', 'black')
-                  .style('border', '2px solid white')
+                  .style('border', 'none')
                   .parent(buttonContainer);
     
     createButton('').mousePressed(() => selectedShape = 'triangle')
@@ -55,6 +64,7 @@ function setup() {
                   .style('border-left', '15px solid transparent')
                   .style('border-right', '15px solid transparent')
                   .style('border-bottom', '30px solid black')
+                  .style('border', 'none')
                   .parent(buttonContainer);
 }
 
