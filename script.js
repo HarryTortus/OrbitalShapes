@@ -1,7 +1,7 @@
 let shapes = [];
 let sliderA, sliderB, sliderC, sizeSlider;
 let sliderContainer, buttonContainer;
-let versionNumber = "0.07"; // Change this for version updates
+let versionNumber = "0.08"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 
 function setup() {
@@ -21,21 +21,25 @@ function setup() {
                                      .style('padding', '10px')
                                      .style('background', '#888')
                                      .style('display', 'flex')
+                                     .style('flex-wrap', 'wrap')
                                      .style('justify-content', 'center')
                                      .style('align-items', 'center')
                                      .style('gap', '10px');
     
-    sliderA = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
-    createSpan('Motion A').style('color', 'white').parent(sliderContainer);
+    function createLabeledSlider(labelText, min, max, defaultValue) {
+        let container = createDiv('').style('display', 'flex')
+                                     .style('flex-direction', 'column')
+                                     .style('align-items', 'center')
+                                     .parent(sliderContainer);
+        let slider = createSlider(min, max, defaultValue, 0.1).style('width', '150px').style('height', '20px').parent(container);
+        createSpan(labelText).style('color', 'white').parent(container);
+        return slider;
+    }
     
-    sliderB = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
-    createSpan('Motion B').style('color', 'white').parent(sliderContainer);
-    
-    sliderC = createSlider(1, 10, 5, 0.1).style('width', '150px').style('height', '20px').parent(sliderContainer);
-    createSpan('Motion C').style('color', 'white').parent(sliderContainer);
-    
-    sizeSlider = createSlider(10, min(windowWidth, windowHeight) * 0.75, 50).style('width', '150px').style('height', '20px').parent(sliderContainer);
-    createSpan('Size').style('color', 'white').parent(sliderContainer);
+    sliderA = createLabeledSlider('Motion A', 1, 10, 5);
+    sliderB = createLabeledSlider('Motion B', 1, 10, 5);
+    sliderC = createLabeledSlider('Motion C', 1, 10, 5);
+    sizeSlider = createLabeledSlider('Size', 10, min(windowWidth, windowHeight) * 0.75, 50);
     
     // Create shape selection buttons as shapes
     buttonContainer = createDiv('').style('display', 'flex')
@@ -64,7 +68,6 @@ function setup() {
                   .style('border-left', '15px solid transparent')
                   .style('border-right', '15px solid transparent')
                   .style('border-bottom', '30px solid black')
-                  .style('border', 'none')
                   .parent(buttonContainer);
 }
 
