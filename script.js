@@ -1,7 +1,7 @@
 let shapes = [];
-let sliderA, sliderB, sliderC, sizeSlider;
+let gravitySlider, lSystemSlider, collisionSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.12"; // Change this for version updates
+let versionNumber = "0.13"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 let motionActive = false; // Start paused
 
@@ -33,11 +33,9 @@ function setup() {
                             motionActive = !motionActive;
                             motionButton.html(motionActive ? '⏸' : '▶');
                         })
-                        .style('width', '40px')
-                        .style('height', '40px')
-                        .style('background', '#888')
-                        .style('color', '#3fd16b')
-                        .style('font-size', '30px')
+                        .style('width', '30px')
+                        .style('height', '30px')
+                        .style('background', '#3fd16b')
                         .style('border', 'none')
                         .style('cursor', 'pointer')
                         .parent(leftControls);
@@ -61,9 +59,9 @@ function setup() {
         return slider;
     }
     
-    sliderA = createLabeledSlider('Fracture Intensity', 1, 10, 5);
-    sliderB = createLabeledSlider('Motion Speed', 1, 10, 5);
-    sliderC = createLabeledSlider('Randomness', 1, 10, 5);
+    gravitySlider = createLabeledSlider('Gravity', 0, 10, 5);
+    lSystemSlider = createLabeledSlider('L-System', 0, 10, 5);
+    collisionSlider = createLabeledSlider('Collision Intensity', 0, 10, 5);
     sizeSlider = createLabeledSlider('Size', 10, min(windowWidth, windowHeight) * 0.75, 50);
     
     buttonContainer = createDiv('').style('display', 'flex')
@@ -105,11 +103,8 @@ function draw() {
     if (motionActive) {
         for (let shape of shapes) {
             shape.update();
+            shape.display();
         }
-    }
-    
-    for (let shape of shapes) {
-        shape.display();
     }
 }
 
@@ -136,11 +131,26 @@ class Shape {
         this.ySpeed = random(-2, 2);
     }
     update() {
-        let a = sliderA.value();
-        let b = sliderB.value();
-        let c = sliderC.value();
-        this.x += this.xSpeed + sin(frameCount * 0.05 * a) * b;
-        this.y += this.ySpeed + cos(frameCount * 0.05 * b) * c;
+        let gravity = gravitySlider.value();
+        let lSystem = lSystemSlider.value();
+        let collision = collisionSlider.value();
+        
+        for (let other of shapes) {
+            if (other !== this) {
+                let d = dist(this.x, this.y, other.x, other.y);
+                if (d < this.size / 2 + other.size / 2) {
+                    if (collision > 0) {
+                        let newSize = this.size * 0.5;
+                        shapes.push(new Shape(this.x, this.y, this.type));
+                        shapes[shapes.length - 1].size = newSize;
+                        this.size = newSize;
+                    }
+                }
+                let attraction = (this.size + other.size) * 0.001 * gravity;
+                this.x += (other.x - this.x) * attraction;
+                this.y += (other.y - this.y) * attraction;
+            }
+        }
     }
     display() {
         push();
@@ -161,3 +171,4 @@ class Shape {
         pop();
     }
 }
+
