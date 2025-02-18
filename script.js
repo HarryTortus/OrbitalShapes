@@ -1,9 +1,9 @@
-let shapes = [];
+let shapes = []; 
 let gravitySlider, lSystemSlider, collisionSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = 0.18; // Starting version
-let selectedShape = 'circle'; // Default shape
-let motionActive = false; // Start paused
+let versionNumber = "0.19"; // Updated version number
+let selectedShape = 'circle'; 
+let motionActive = false; 
 const MAX_SHAPES = 100;
 
 function setup() {
@@ -116,63 +116,11 @@ function setup() {
     updateShapeButtonColors();
 }
 
-// Shape class definition
-class Shape {
-    constructor(x, y, shapeType) {
-        this.x = x;
-        this.y = y;
-        this.size = sizeSlider.value();
-        this.shapeType = shapeType;
-        this.color = color(random(255), random(255), random(255));
-        this.velX = random(-1, 1);
-        this.velY = random(-1, 1);
-        this.mass = this.size / 10; // Mass proportional to size
-    }
-    
-    update() {
-        // Gravity effect: pull smaller shapes towards bigger ones
-        for (let other of shapes) {
-            if (other !== this) {
-                let dx = other.x - this.x;
-                let dy = other.y - this.y;
-                let distance = dist(this.x, this.y, other.x, other.y);
-                let force = gravitySlider.value() * (this.mass * other.mass) / (distance * distance);
-                let angle = atan2(dy, dx);
-                
-                this.velX += cos(angle) * force;
-                this.velY += sin(angle) * force;
-            }
-        }
-        
-        // L-System inspired movement (for simplicity, random movement influenced by slider)
-        this.velX += random(-lSystemSlider.value() * 0.01, lSystemSlider.value() * 0.01);
-        this.velY += random(-lSystemSlider.value() * 0.01, lSystemSlider.value() * 0.01);
-        
-        this.x += this.velX;
-        this.y += this.velY;
-        
-        // Ensure shapes stay within canvas boundaries
-        this.x = constrain(this.x, 0, width);
-        this.y = constrain(this.y, 0, height - 50);
-    }
-    
-    display() {
-        fill(this.color);
-        if (this.shapeType === 'circle') {
-            ellipse(this.x, this.y, this.size);
-        } else if (this.shapeType === 'square') {
-            rect(this.x, this.y, this.size, this.size);
-        } else if (this.shapeType === 'triangle') {
-            triangle(this.x, this.y - this.size / 2, this.x - this.size / 2, this.y + this.size / 2, this.x + this.size / 2, this.y + this.size / 2);
-        }
-    }
-}
-
 function draw() {
     background(0, 20);
     fill(255);
     textSize(16);
-    text(`Version: ${versionNumber.toFixed(2)}`, 10, 30);
+    text(`Version: ${versionNumber}`, 10, 30);
     
     if (motionActive) {
         for (let shape of shapes) {
@@ -200,9 +148,79 @@ function mousePressed() {
     }
 }
 
-function updateVersion() {
-    versionNumber += 0.01;
+// Shape class
+class Shape {
+    constructor(x, y, type) {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.size = sizeSlider.value();
+        this.mass = this.size / 10; // Larger mass for bigger shapes
+        this.velX = random(-2, 2);
+        this.velY = random(-2, 2);
+        this.color = color(random(255), random(255), random(255));
+    }
+    
+    update() {
+        // Apply gravity based on size
+        for (let other of shapes) {
+            if (other !== this) {
+                let dx = other.x - this.x;
+                let dy = other.y - this.y;
+                let distance = sqrt(dx * dx + dy * dy);
+                
+                // Gravity formula: F = (G * m1 * m2) / r^2
+                let force = gravitySlider.value() * this.mass * other.mass / (distance * distance);
+                let angle = atan2(dy, dx);
+                
+                // Apply force to each shape's velocity
+                this.velX += cos(angle) * force;
+                this.velY += sin(angle) * force;
+            }
+        }
+        
+        // Update position
+        this.x += this.velX;
+        this.y += this.velY;
+        
+        // Disappear when going off-screen
+        if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+            let index = shapes.indexOf(this);
+            if (index > -1) {
+                shapes.splice(index, 1);
+            }
+        }
+        
+        // Check for collisions with other shapes
+        for (let other of shapes) {
+            if (other !== this) {
+                let dist = dist(this.x, this.y, other.x, other.y);
+                if (dist < (this.size + other.size) / 2) {
+                    // Split shapes into two half-sized shapes and bounce
+                    let newShape1 = new Shape(this.x, this.y, this.type);
+                    let newShape2 = new Shape(other.x, other.y, other.type);
+                    newShape1.size = this.size / 2;
+                    newShape2.size = other.size / 2;
+                    shapes.push(newShape1, newShape2);
+                    
+                    // Remove the original shapes
+                    shapes.splice(shapes.indexOf(this), 1);
+                    shapes.splice(shapes.indexOf(other), 1);
+                    break;
+                }
+            }
+        }
+    }
+    
+    display() {
+        noStroke();
+        fill(this.color);
+        if (this.type === 'circle') {
+            ellipse(this.x, this.y, this.size);
+        } else if (this.type === 'square') {
+            rect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
+        } else if (this.type === 'triangle') {
+            triangle(this.x, this.y - this.size / 2, this.x - this.size / 2, this.y + this.size / 2, this.x + this.size / 2, this.y + this.size / 2);
+        }
+    }
 }
-
-
-
