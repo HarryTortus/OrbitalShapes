@@ -1,7 +1,7 @@
 let shapes = [];
 let gravitySlider, lSystemSlider, collisionSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.24";
+let versionNumber = "0.28";
 let selectedShape = 'circle';
 let motionActive = false;
 const MAX_SHAPES = 100;
@@ -80,7 +80,8 @@ function setup() {
             .style('flex-direction', 'column')
             .style('align-items', 'center')
             .parent(sliderContainer);
-        let slider = createSlider(min, max, defaultValue, 0.1).style('width', '150px')
+        let slider = createSlider(min, max, defaultValue, 0.1)
+            .style('width', '150px')
             .style('height', '20px')
             .style('accent-color', '#3fd16b')
             .parent(container);
@@ -124,3 +125,124 @@ function setup() {
     }
     updateShapeButtonColors();
 }
+
+function draw() {
+    background(0, 20);
+    fill(255);
+    textSize(16);
+    text(`Version: ${versionNumber}`, 10, 30);
+
+    if (motionActive) {
+        for (let i = shapes.length - 1; i >= 0; i--) {
+            shapes[i].update();
+            shapes[i].display();
+
+            if (shapes[i].isOffScreen()) {
+                shapes.splice(i, 1);
+            }
+        }
+    } else {
+        for (let shape of shapes) {
+            shape.display();
+        }
+    }
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+}
+
+function mousePressed() {
+    if (mouseY < height - barHeight) {
+        if (shapes.length >= MAX_SHAPES) {
+            shapes.shift();
+        }
+        let s = new Shape(mouseX, mouseY, selectedShape);
+        shapes.push(s);
+    }
+}
+
+class Shape {
+    constructor(x, y, type) {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.size = sizeSlider.value();
+        this.mass = this.size / 10;
+        this.velX = random(-2, 2);
+        this.velY = random(-2, 2);
+        this.color = color(random(255), random(255), random(255));
+        this.rotation = random(360);
+        this.rotationSpeed = random(-2, 2);
+    }
+
+    update() {
+        this.velY += gravitySlider.value() * this.mass / 100;
+
+        // --- L-System Influence (Simplified for now) ---
+        this.velX += (noise(this.x * 0.01, this.y * 0.01) - 0.5) * lSystemSlider.value() * 0.1;
+        this.velY += (noise(this.x * 0.01 + 100, this.y * 0.01 + 100) - 0.5) * lSystemSlider.value() * 0.1;
+
+        this.x += this.velX;
+        this.y += this.velY;
+
+        this.rotation += this.rotationSpeed;
+
+        // Collision detection (simplified)
+        for (let other of shapes) {
+            if (other !== this) {
+                let dx = other.x - this.x;
+                let dy = other.y - this.y;
+                let distance = sqrt(dx * dx + dy * dy);
+                let minDist = (this.size + other.size) / 2;
+
+                if (distance < minDist) {
+                    let angle = atan2(dy, dx);
+                    let overlap = minDist - distance;
+
+                    let pushX = overlap * cos(angle) * 0.5;
+                    let pushY = overlap * sin(angle) * 0.5;
+
+                    this.x -= pushX;
+                    this.y -= pushY;
+                    other.x += pushX;
+                    other.y += pushY;
+
+                    let thisVel = createVector(this.velX, this.velY);
+                    let otherVel = createVector(other.velX, other.velY);
+                    this.velX = otherVel.x;
+                    this.velY = otherVel.y;
+                    other.velX = thisVel.x;
+                    other.velY = thisVel.y;
+                }
+            }
+        }
+    }
+
+    isOffScreen() {
+        const margin = this.size * 2;
+        return (
+            this.x + margin < 0 ||
+            this.x - margin > width ||
+            this.y + margin < 0 ||
+            this.y - margin > height - barHeight
+        );
+    }
+
+    display() {
+        noStroke();
+        fill(this.color);
+        push();
+        translate(this.x, this.y);
+        rotate(this.rotation);
+        if (this.type === 'circle') {
+            ellipse(0, 0, this.size);
+        } else if (this.type === 'square') {
+            rectMode(CENTER);
+            rect(0, 0, this.size, this.size);
+        } else if (this.type === 'triangle') {
+            triangle(0, -this.size / 2, -this.size / 2, this.size / 2, this.size / 2, this.size / 2);
+        }
+        pop();
+    }
+} // End of Shape class
