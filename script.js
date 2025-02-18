@@ -1,7 +1,7 @@
 let shapes = [];
-let gravitySlider, lSystemSlider, collisionSlider, sizeSlider;
+let gravitySlider, lSystemSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.28";
+let versionNumber = "0.40"; // Updated version number
 let selectedShape = 'circle';
 let motionActive = false;
 const MAX_SHAPES = 100;
@@ -54,7 +54,6 @@ function setup() {
             shapes = [];
             gravitySlider.value(5);
             lSystemSlider.value(5);
-            collisionSlider.value(5);
             sizeSlider.value(50);
         })
         .style('width', '60px')
@@ -91,8 +90,7 @@ function setup() {
 
     gravitySlider = createLabeledSlider('Gravity', 0, 10, 5);
     lSystemSlider = createLabeledSlider('L-System', 0, 10, 5);
-    collisionSlider = createLabeledSlider('Collision Intensity', 0, 10, 5);
-    sizeSlider = createLabeledSlider('Size', 10, min(windowWidth, windowHeight) * 0.75, 50);
+    sizeSlider = createLabeledSlider('Size', 10, min(windowWidth, windowHeight) * 0.5, 20);
 
     buttonContainer = createDiv('').style('display', 'flex')
         .style('gap', '20px')
@@ -168,7 +166,7 @@ class Shape {
         this.y = y;
         this.type = type;
         this.size = sizeSlider.value();
-        this.mass = this.size / 10;
+        this.updateMass();
         this.velX = random(-2, 2);
         this.velY = random(-2, 2);
         this.color = color(random(255), random(255), random(255));
@@ -176,10 +174,43 @@ class Shape {
         this.rotationSpeed = random(-2, 2);
     }
 
-    update() {
-        this.velY += gravitySlider.value() * this.mass / 100;
+    updateMass() {
+        if (this.type === 'circle') {
+            this.mass = PI * (this.size / 2) * (this.size / 2);
+        } else if (this.type === 'square') {
+            this.mass = this.size * this.size;
+        } else if (this.type === 'triangle') {
+            this.mass = (this.size * this.size * sqrt(3) / 4);
+        }
+        this.mass /= 10; // Adjust mass scale as needed
+    }
 
-        // --- L-System Influence (Simplified for now) ---
+    update() {
+        // Gravitational pull based on size (from the second file)
+        for (let other of shapes) {
+            if (other !== this) {
+                let dx = other.x - this.x;
+                let dy = other.y - this.y;
+                let distance = sqrt(dx * dx + dy * dy);
+
+                let minDistance = (this.size + other.size) / 2;
+                distance = max(distance, minDistance); // Prevent
+                let force = (gravitySlider.value() * this.mass * other.mass) / (distance * distance);
+
+                let angle = atan2(dy, dx);
+
+                let forceX = cos(angle) * force;
+                let forceY = sin(angle) * force;
+
+                this.velX += forceX / this.mass;
+                this.velY += forceY / this.mass;
+
+                other.velX -= forceX / other.mass; // Equal and opposite force
+                other.velY -= forceY / other.mass;
+            }
+        }
+
+        // --- L-System Influence (same as your second file)
         this.velX += (noise(this.x * 0.01, this.y * 0.01) - 0.5) * lSystemSlider.value() * 0.1;
         this.velY += (noise(this.x * 0.01 + 100, this.y * 0.01 + 100) - 0.5) * lSystemSlider.value() * 0.1;
 
@@ -188,7 +219,7 @@ class Shape {
 
         this.rotation += this.rotationSpeed;
 
-        // Collision detection (simplified)
+        // Collision detection (from the first file - simplified)
         for (let other of shapes) {
             if (other !== this) {
                 let dx = other.x - this.x;
@@ -245,4 +276,9 @@ class Shape {
         }
         pop();
     }
-} // End of Shape class
+}
+
+// Helper function to clamp values within a range (OUTSIDE the Shape class)
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
