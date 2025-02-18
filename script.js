@@ -1,7 +1,7 @@
-let shapes = []; 
+let shapes = [];
 let gravitySlider, lSystemSlider, collisionSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.19b"; // Updated version number
+let versionNumber = "0.20"; // Updated version number
 let selectedShape = 'circle'; 
 let motionActive = false; 
 const MAX_SHAPES = 100;
@@ -23,7 +23,8 @@ function setup() {
                                     .style('display', 'flex')
                                     .style('flex-wrap', 'wrap')
                                     .style('justify-content', 'space-between')
-                                    .style('align-items', 'center');
+                                    .style('align-items', 'center')
+                                    .style('z-index', '10');
     
     let leftControls = createDiv('').style('display', 'flex')
                                    .style('gap', '10px')
@@ -41,6 +42,9 @@ function setup() {
                         .style('color', '#3fd16b')
                         .style('border', 'none')
                         .style('cursor', 'pointer')
+                        .style('display', 'flex')
+                        .style('justify-content', 'center')
+                        .style('align-items', 'center')
                         .parent(leftControls);
     
     let restartButton = createButton('⟳')
@@ -58,6 +62,9 @@ function setup() {
                         .style('color', '#3fd16b')
                         .style('border', 'none')
                         .style('cursor', 'pointer')
+                        .style('display', 'flex')
+                        .style('justify-content', 'center')
+                        .style('align-items', 'center')
                         .parent(leftControls);
     
     sliderContainer = createDiv('').style('display', 'flex')
@@ -141,6 +148,7 @@ function windowResized() {
 }
 
 function mousePressed() {
+    // Prevent shapes from being placed on the bottom bar
     if (mouseY < height - 50) {
         if (shapes.length >= MAX_SHAPES) {
             shapes.shift();
