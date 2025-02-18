@@ -1,7 +1,7 @@
 let shapes = [];
 let sliderA, sliderB, sliderC, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.11"; // Change this for version updates
+let versionNumber = "0.11b"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 let motionActive = true; // Toggle motion state
 
@@ -28,11 +28,13 @@ function setup() {
                                    .style('gap', '10px')
                                    .parent(controlContainer);
 
-    let motionButton = createButton('Start/Stop Motion')
+    let motionButton = createButton('')
                         .mousePressed(() => motionActive = !motionActive)
+                        .style('width', '30px')
+                        .style('height', '30px')
                         .style('background', '#3fd16b')
-                        .style('color', 'black')
-                        .style('padding', '5px 10px')
+                        .style('mask-image', 'url(play_pause_icon.svg)')
+                        .style('-webkit-mask-image', 'url(play_pause_icon.svg)')
                         .style('border', 'none')
                         .style('cursor', 'pointer')
                         .parent(leftControls);
@@ -62,7 +64,8 @@ function setup() {
     sizeSlider = createLabeledSlider('Size', 10, min(windowWidth, windowHeight) * 0.75, 50);
     
     buttonContainer = createDiv('').style('display', 'flex')
-                                   .style('gap', '10px')
+                                   .style('gap', '20px')
+                                   .style('margin-right', '20px')
                                    .parent(controlContainer);
     
     createButton('').mousePressed(() => selectedShape = 'circle')
@@ -159,3 +162,4 @@ class Shape {
         pop();
     }
 }
+
