@@ -1,9 +1,10 @@
 let shapes = [];
 let gravitySlider, lSystemSlider, collisionSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.13"; // Change this for version updates
+let versionNumber = "0.14"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 let motionActive = false; // Start paused
+const MAX_SHAPES = 100;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -35,7 +36,24 @@ function setup() {
                         })
                         .style('width', '30px')
                         .style('height', '30px')
-                        .style('background', '#3fd16b')
+                        .style('background', '#888')
+                        .style('color', '#3fd16b')
+                        .style('border', 'none')
+                        .style('cursor', 'pointer')
+                        .parent(leftControls);
+    
+    let restartButton = createButton('⟳')
+                        .mousePressed(() => {
+                            shapes = [];
+                            gravitySlider.value(5);
+                            lSystemSlider.value(5);
+                            collisionSlider.value(5);
+                            sizeSlider.value(50);
+                        })
+                        .style('width', '30px')
+                        .style('height', '30px')
+                        .style('background', '#888')
+                        .style('color', '#3fd16b')
                         .style('border', 'none')
                         .style('cursor', 'pointer')
                         .parent(leftControls);
@@ -69,29 +87,31 @@ function setup() {
                                    .style('margin-right', '20px')
                                    .parent(controlContainer);
     
-    createButton('').mousePressed(() => selectedShape = 'circle')
-                  .style('width', '30px')
-                  .style('height', '30px')
-                  .style('background', 'black')
-                  .style('border-radius', '50%')
-                  .style('border', 'none')
-                  .parent(buttonContainer);
+    function createShapeButton(shapeType, clipPath) {
+        let button = createButton('')
+                        .mousePressed(() => {
+                            selectedShape = shapeType;
+                            updateShapeButtonColors();
+                        })
+                        .style('width', '30px')
+                        .style('height', '30px')
+                        .style('background', '#000')
+                        .style('border', 'none')
+                        .style('clip-path', clipPath)
+                        .parent(buttonContainer);
+        return button;
+    }
     
-    createButton('').mousePressed(() => selectedShape = 'square')
-                  .style('width', '30px')
-                  .style('height', '30px')
-                  .style('background', 'black')
-                  .style('border', 'none')
-                  .parent(buttonContainer);
+    let circleButton = createShapeButton('circle', 'circle(50%)');
+    let squareButton = createShapeButton('square', 'none');
+    let triangleButton = createShapeButton('triangle', 'polygon(50% 0%, 0% 100%, 100% 100%)');
     
-    createButton('').mousePressed(() => selectedShape = 'triangle')
-                  .style('width', '30px')
-                  .style('height', '30px')
-                  .style('background', 'transparent')
-                  .style('clip-path', 'polygon(50% 0%, 0% 100%, 100% 100%)')
-                  .style('background-color', 'black')
-                  .style('border', 'none')
-                  .parent(buttonContainer);
+    function updateShapeButtonColors() {
+        circleButton.style('background', selectedShape === 'circle' ? '#3fd16b' : '#000');
+        squareButton.style('background', selectedShape === 'square' ? '#3fd16b' : '#000');
+        triangleButton.style('background', selectedShape === 'triangle' ? '#3fd16b' : '#000');
+    }
+    updateShapeButtonColors();
 }
 
 function draw() {
@@ -114,61 +134,12 @@ function windowResized() {
 
 function mousePressed() {
     if (mouseY < height - 50) {
+        if (shapes.length >= MAX_SHAPES) {
+            shapes.shift();
+        }
         let s = new Shape(mouseX, mouseY, selectedShape);
         shapes.push(s);
     }
 }
 
-class Shape {
-    constructor(x, y, type) {
-        this.x = x;
-        this.y = y;
-        this.size = sizeSlider.value();
-        this.color = color(random(255), random(255), random(255));
-        this.type = type;
-        this.rotation = random(TWO_PI);
-        this.xSpeed = random(-2, 2);
-        this.ySpeed = random(-2, 2);
-    }
-    update() {
-        let gravity = gravitySlider.value();
-        let lSystem = lSystemSlider.value();
-        let collision = collisionSlider.value();
-        
-        for (let other of shapes) {
-            if (other !== this) {
-                let d = dist(this.x, this.y, other.x, other.y);
-                if (d < this.size / 2 + other.size / 2) {
-                    if (collision > 0) {
-                        let newSize = this.size * 0.5;
-                        shapes.push(new Shape(this.x, this.y, this.type));
-                        shapes[shapes.length - 1].size = newSize;
-                        this.size = newSize;
-                    }
-                }
-                let attraction = (this.size + other.size) * 0.001 * gravity;
-                this.x += (other.x - this.x) * attraction;
-                this.y += (other.y - this.y) * attraction;
-            }
-        }
-    }
-    display() {
-        push();
-        translate(this.x, this.y);
-        rotate(this.rotation);
-        fill(this.color);
-        noStroke();
-        if (this.type === 'circle') {
-            ellipse(0, 0, this.size);
-        } else if (this.type === 'square') {
-            rectMode(CENTER);
-            rect(0, 0, this.size, this.size);
-        } else if (this.type === 'triangle') {
-            triangle(0, -this.size / 2, 
-                     -this.size / 2, this.size / 2, 
-                     this.size / 2, this.size / 2);
-        }
-        pop();
-    }
-}
 
