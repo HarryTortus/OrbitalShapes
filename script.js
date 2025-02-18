@@ -1,7 +1,7 @@
 let shapes = [];
 let sliderA, sliderB, sliderC, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.11b"; // Change this for version updates
+let versionNumber = "0.11c"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 let motionActive = true; // Toggle motion state
 
@@ -162,4 +162,3 @@ class Shape {
         pop();
     }
 }
-
