@@ -1,7 +1,7 @@
 let shapes = [];
 let gravitySlider, lSystemSlider, collisionSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.21"; // Updated version number
+let versionNumber = "0.22"; // Updated version number
 let selectedShape = 'circle'; 
 let motionActive = false; 
 const MAX_SHAPES = 100;
@@ -148,8 +148,8 @@ function windowResized() {
 }
 
 function mousePressed() {
-    // Prevent shapes from being placed on the bottom bar
-    if (mouseY < height - 50) {
+    // Prevent shapes from being placed on the bottom bar (adjusted click detection)
+    if (mouseY < height - 50 && mouseY > height - controlContainer.elt.clientHeight) {
         if (shapes.length >= MAX_SHAPES) {
             shapes.shift();
         }
