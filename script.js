@@ -1,9 +1,9 @@
 let shapes = [];
 let sliderA, sliderB, sliderC, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.11c"; // Change this for version updates
+let versionNumber = "0.12"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
-let motionActive = true; // Toggle motion state
+let motionActive = false; // Start paused
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -28,13 +28,16 @@ function setup() {
                                    .style('gap', '10px')
                                    .parent(controlContainer);
 
-    let motionButton = createButton('')
-                        .mousePressed(() => motionActive = !motionActive)
+    let motionButton = createButton('▶')
+                        .mousePressed(() => {
+                            motionActive = !motionActive;
+                            motionButton.html(motionActive ? '⏸' : '▶');
+                        })
                         .style('width', '30px')
                         .style('height', '30px')
                         .style('background', '#3fd16b')
-                        .style('mask-image', 'url(play_pause_icon.svg)')
-                        .style('-webkit-mask-image', 'url(play_pause_icon.svg)')
+                        .style('color', 'white')
+                        .style('font-size', '20px')
                         .style('border', 'none')
                         .style('cursor', 'pointer')
                         .parent(leftControls);
@@ -102,8 +105,11 @@ function draw() {
     if (motionActive) {
         for (let shape of shapes) {
             shape.update();
-            shape.display();
         }
+    }
+    
+    for (let shape of shapes) {
+        shape.display();
     }
 }
 
@@ -135,13 +141,6 @@ class Shape {
         let c = sliderC.value();
         this.x += this.xSpeed + sin(frameCount * 0.05 * a) * b;
         this.y += this.ySpeed + cos(frameCount * 0.05 * b) * c;
-        
-        if (this.size > 30) {
-            let newSize = this.size * 0.5;
-            shapes.push(new Shape(this.x, this.y, this.type));
-            shapes[shapes.length - 1].size = newSize;
-            this.size = newSize;
-        }
     }
     display() {
         push();
