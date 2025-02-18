@@ -1,7 +1,7 @@
 let shapes = [];
 let sliderA, sliderB, sliderC, sizeSlider;
 let sliderContainer, buttonContainer;
-let versionNumber = "0.09b"; // Change this for version updates
+let versionNumber = "0.09c"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 
 function setup() {
@@ -127,3 +127,4 @@ class Shape {
         }
     }
 }
+
