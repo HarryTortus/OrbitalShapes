@@ -1,7 +1,7 @@
 let shapes = [];
 let sliderA, sliderB, sliderC, sizeSlider;
 let sliderContainer, buttonContainer;
-let versionNumber = "0.08"; // Change this for version updates
+let versionNumber = "0.09"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 
 function setup() {
@@ -31,7 +31,7 @@ function setup() {
                                      .style('flex-direction', 'column')
                                      .style('align-items', 'center')
                                      .parent(sliderContainer);
-        let slider = createSlider(min, max, defaultValue, 0.1).style('width', '150px').style('height', '20px').parent(container);
+        let slider = createSlider(min, max, defaultValue, 0.1).style('width', '150px').style('height', '20px').style('background', 'olive').parent(container);
         createSpan(labelText).style('color', 'white').parent(container);
         return slider;
     }
@@ -68,6 +68,7 @@ function setup() {
                   .style('border-left', '15px solid transparent')
                   .style('border-right', '15px solid transparent')
                   .style('border-bottom', '30px solid black')
+                  .style('border-radius', 'none')
                   .parent(buttonContainer);
 }
 
@@ -126,4 +127,3 @@ class Shape {
         }
     }
 }
-
