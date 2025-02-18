@@ -1,7 +1,7 @@
 let shapes = [];
 let gravitySlider, lSystemSlider, collisionSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.20"; // Updated version number
+let versionNumber = "0.21"; // Updated version number
 let selectedShape = 'circle'; 
 let motionActive = false; 
 const MAX_SHAPES = 100;
@@ -234,4 +234,3 @@ class Shape {
         }
     }
 }
-
