@@ -5,13 +5,18 @@ function setup() {
     createCanvas(windowWidth, windowHeight);
     background(0);
     
-    // Create sliders
-    sliderA = createSlider(1, 10, 5, 0.1);
-    sliderB = createSlider(1, 10, 5, 0.1);
-    sliderC = createSlider(1, 10, 5, 0.1);
-    sliderA.position(10, 10);
-    sliderB.position(10, 40);
-    sliderC.position(10, 70);
+    // Create sliders at the bottom of the screen with a gray border
+    let sliderContainer = createDiv('').style('position', 'absolute')
+                                     .style('bottom', '10px')
+                                     .style('left', '50%')
+                                     .style('transform', 'translateX(-50%)')
+                                     .style('padding', '10px')
+                                     .style('background', '#888')
+                                     .style('border-radius', '10px');
+    
+    sliderA = createSlider(1, 10, 5, 0.1).parent(sliderContainer);
+    sliderB = createSlider(1, 10, 5, 0.1).parent(sliderContainer);
+    sliderC = createSlider(1, 10, 5, 0.1).parent(sliderContainer);
 }
 
 function draw() {
@@ -24,7 +29,7 @@ function draw() {
 }
 
 function mousePressed() {
-    let s = new Shape(mouseX, mouseY);
+    let s = new Shape(width / 2, height / 2); // Start movement in the middle
     shapes.push(s);
 }
 
@@ -48,3 +53,4 @@ class Shape {
         ellipse(this.x, this.y, this.size);
     }
 }
+
