@@ -1,7 +1,7 @@
 let shapes = []; 
 let gravitySlider, lSystemSlider, collisionSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.19"; // Updated version number
+let versionNumber = "0.19b"; // Updated version number
 let selectedShape = 'circle'; 
 let motionActive = false; 
 const MAX_SHAPES = 100;
@@ -123,11 +123,13 @@ function draw() {
     text(`Version: ${versionNumber}`, 10, 30);
     
     if (motionActive) {
+        // Update and display all shapes only if motion is active
         for (let shape of shapes) {
             shape.update();
             shape.display();
         }
     } else {
+        // Display shapes without updating position if motion is inactive
         for (let shape of shapes) {
             shape.display();
         }
@@ -224,3 +226,4 @@ class Shape {
         }
     }
 }
+
