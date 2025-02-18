@@ -1,7 +1,7 @@
 let shapes = [];
 let gravitySlider, lSystemSlider, collisionSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.14"; // Change this for version updates
+let versionNumber = "0.14b"; // Change this for version updates
 let selectedShape = 'circle'; // Default shape
 let motionActive = false; // Start paused
 const MAX_SHAPES = 100;
@@ -34,8 +34,8 @@ function setup() {
                             motionActive = !motionActive;
                             motionButton.html(motionActive ? '⏸' : '▶');
                         })
-                        .style('width', '30px')
-                        .style('height', '30px')
+                        .style('width', '60px')
+                        .style('height', '60px')
                         .style('background', '#888')
                         .style('color', '#3fd16b')
                         .style('border', 'none')
@@ -50,8 +50,8 @@ function setup() {
                             collisionSlider.value(5);
                             sizeSlider.value(50);
                         })
-                        .style('width', '30px')
-                        .style('height', '30px')
+                        .style('width', '60px')
+                        .style('height', '60px')
                         .style('background', '#888')
                         .style('color', '#3fd16b')
                         .style('border', 'none')
@@ -125,6 +125,10 @@ function draw() {
             shape.update();
             shape.display();
         }
+    } else {
+        for (let shape of shapes) {
+            shape.display();
+        }
     }
 }
 
@@ -141,5 +145,3 @@ function mousePressed() {
         shapes.push(s);
     }
 }
-
-
