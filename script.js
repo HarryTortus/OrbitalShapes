@@ -1,7 +1,7 @@
 let shapes = [];
 let gravitySlider, lSystemSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.42"; // Updated version number
+let versionNumber = "0.43"; // Updated version number
 let selectedShape = 'circle';
 let motionActive = false;
 const MAX_SHAPES = 100;
@@ -182,8 +182,8 @@ class Shape {
         this.type = type;
         this.size = sizeSlider.value();
         this.updateMass();
-        this.velX = random(-2, 2);
-        this.velY = random(-2, 2);
+        this.velX = random(-.5, .5);
+        this.velY = random(-.5, .5);
         this.color = color(random(255), random(255), random(255));
         this.rotation = random(360);
         this.rotationSpeed = random(-.1, .1);
@@ -201,7 +201,7 @@ class Shape {
     }
 
     update() {
-        // Gravitational pull based on size (from the second file)
+        // Gravitational pull based on size
         for (let other of shapes) {
             if (other !== this) {
                 let dx = other.x - this.x;
@@ -225,16 +225,16 @@ class Shape {
             }
         }
 
-        // --- L-System Influence (same as your second file)
-        this.velX += (noise(this.x * 0.01, this.y * 0.01) - 0.5) * lSystemSlider.value() * 0.1;
-        this.velY += (noise(this.x * 0.01 + 100, this.y * 0.01 + 100) - 0.5) * lSystemSlider.value() * 0.1;
+        // --- L-System Influence
+        this.velX += (noise(this.x * 0.01, this.y * 0.01) - 0.5) * lSystemSlider.value() * 0.01;
+        this.velY += (noise(this.x * 0.01 + 100, this.y * 0.01 + 100) - 0.5) * lSystemSlider.value() * 0.01;
 
         this.x += this.velX;
         this.y += this.velY;
 
         this.rotation += this.rotationSpeed;
 
-        // Collision detection (from the first file - simplified)
+        // Collision detection
         for (let other of shapes) {
             if (other !== this) {
                 let dx = other.x - this.x;
