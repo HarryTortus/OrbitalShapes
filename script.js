@@ -1,7 +1,7 @@
 let shapes = [];
 let gravitySlider, lSystemSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.41"; // Updated version number
+let versionNumber = "0.42"; // Updated version number
 let selectedShape = 'circle';
 let motionActive = false;
 const MAX_SHAPES = 100;
@@ -90,7 +90,7 @@ function setup() {
 
     gravitySlider = createLabeledSlider('Gravity', 0, 10, 2);
     lSystemSlider = createLabeledSlider('Randomize Movement', 0, 10, 0);
-    sizeSlider = createLabeledSlider('Size', 10, min(windowWidth, windowHeight) * 0.5, 20);
+    sizeSlider = createLabeledSlider('Size', 10, min(windowWidth, windowHeight) * 0.20, 20);
 
     buttonContainer = createDiv('').style('display', 'flex')
         .style('gap', '20px')
