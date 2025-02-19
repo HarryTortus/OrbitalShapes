@@ -122,6 +122,21 @@ function setup() {
         triangleButton.style('background', selectedShape === 'triangle' ? '#3fd16b' : '#000');
     }
     updateShapeButtonColors();
+
+     let shapeLabel = createSpan("Select Shape")
+        .style('color', 'white')
+        .style('text-align', 'center')
+        .style('display', 'block')
+        .style('position', 'absolute')
+        .parent(controlContainer);
+
+    setTimeout(() => {
+        shapeLabel.style('width', buttonContainer.elt.offsetWidth + 'px');
+        let labelX = buttonContainer.elt.offsetLeft + (buttonContainer.elt.offsetWidth - shapeLabel.elt.offsetWidth) / 2;
+        shapeLabel.style('left', labelX + 'px');
+        shapeLabel.style('top', controlContainer.elt.offsetHeight - shapeLabel.elt.offsetHeight + 'px');
+    }, 0);
+    
 }
 
 function draw() {
