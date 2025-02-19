@@ -1,7 +1,7 @@
 let shapes = [];
 let gravitySlider, lSystemSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.40"; // Updated version number
+let versionNumber = "0.41"; // Updated version number
 let selectedShape = 'circle';
 let motionActive = false;
 const MAX_SHAPES = 100;
@@ -89,7 +89,7 @@ function setup() {
     }
 
     gravitySlider = createLabeledSlider('Gravity', 0, 10, 5);
-    lSystemSlider = createLabeledSlider('L-System', 0, 10, 5);
+    lSystemSlider = createLabeledSlider('Randomize Movement', 0, 10, 5);
     sizeSlider = createLabeledSlider('Size', 10, min(windowWidth, windowHeight) * 0.5, 20);
 
     buttonContainer = createDiv('').style('display', 'flex')
@@ -226,28 +226,41 @@ class Shape {
                 let dy = other.y - this.y;
                 let distance = sqrt(dx * dx + dy * dy);
                 let minDist = (this.size + other.size) / 2;
-
+        
                 if (distance < minDist) {
-                    let angle = atan2(dy, dx);
+                    // Resolve overlap by moving objects apart
                     let overlap = minDist - distance;
-
-                    let pushX = overlap * cos(angle) * 0.5;
-                    let pushY = overlap * sin(angle) * 0.5;
-
-                    this.x -= pushX;
-                    this.y -= pushY;
-                    other.x += pushX;
-                    other.y += pushY;
-
-                    let thisVel = createVector(this.velX, this.velY);
-                    let otherVel = createVector(other.velX, other.velY);
-                    this.velX = otherVel.x;
-                    this.velY = otherVel.y;
-                    other.velX = thisVel.x;
-                    other.velY = thisVel.y;
+                    let angle = atan2(dy, dx);
+                    let separationX = cos(angle) * overlap * 0.5;
+                    let separationY = sin(angle) * overlap * 0.5;
+        
+                    this.x -= separationX;
+                    this.y -= separationY;
+                    other.x += separationX;
+                    other.y += separationY;
+        
+                    // Compute elastic collision response
+                    let nx = dx / distance;
+                    let ny = dy / distance;
+                    let relativeVelX = this.velX - other.velX;
+                    let relativeVelY = this.velY - other.velY;
+                    let velocityAlongNormal = relativeVelX * nx + relativeVelY * ny;
+        
+                    if (velocityAlongNormal > 0) continue; // Skip if already moving apart
+        
+                    let e = 1; // Coefficient of restitution (1 = perfectly elastic)
+                    let impulse = (-(1 + e) * velocityAlongNormal) / (this.mass + other.mass);
+                    let impulseX = impulse * nx;
+                    let impulseY = impulse * ny;
+        
+                    this.velX -= impulseX * other.mass;
+                    this.velY -= impulseY * other.mass;
+                    other.velX += impulseX * this.mass;
+                    other.velY += impulseY * this.mass;
                 }
             }
         }
+        
     }
 
     isOffScreen() {
