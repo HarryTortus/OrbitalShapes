@@ -5,7 +5,7 @@ let versionNumber = "0.41"; // Updated version number
 let selectedShape = 'circle';
 let motionActive = false;
 const MAX_SHAPES = 100;
-let barHeight = 100;
+let barHeight = 60;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -52,9 +52,9 @@ function setup() {
     let restartButton = createButton('⟳')
         .mousePressed(() => {
             shapes = [];
-            gravitySlider.value(5);
-            lSystemSlider.value(5);
-            sizeSlider.value(50);
+            gravitySlider.value(2);
+            lSystemSlider.value(0);
+            sizeSlider.value(20);
         })
         .style('width', '60px')
         .style('height', '60px')
@@ -88,8 +88,8 @@ function setup() {
         return slider;
     }
 
-    gravitySlider = createLabeledSlider('Gravity', 0, 10, 5);
-    lSystemSlider = createLabeledSlider('Randomize Movement', 0, 10, 5);
+    gravitySlider = createLabeledSlider('Gravity', 0, 10, 2);
+    lSystemSlider = createLabeledSlider('Randomize Movement', 0, 10, 0);
     sizeSlider = createLabeledSlider('Size', 10, min(windowWidth, windowHeight) * 0.5, 20);
 
     buttonContainer = createDiv('').style('display', 'flex')
