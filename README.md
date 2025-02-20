@@ -29,21 +29,3 @@ Orbital Shapes is an interactive simulation that lets you explore the fascinatin
 * **Size Slider:** Control the size and mass of new shapes.
 * **Gravity Slider:** Adjust the overall gravitational force.
 * **Randomize Movement Slider:**  Control the randomness of the shapes' movement.
-
-## Contributing
-
-*(Optional, but highly recommended)*
-
-Contributions are welcome! If you'd like to contribute to the project, please open an issue or submit a pull request.
-
-## License
-
-*(Add a license!  MIT is a common choice)*
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.  *(Create a LICENSE file)*
-
-## Acknowledgements
-
-*(Optional, but good practice)*
-
-Thanks to ChatGPT and Gemini for their assistance in developing this project.
