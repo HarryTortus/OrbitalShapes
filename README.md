@@ -5,9 +5,8 @@ https://harrytortus.github.io/OrbitalShapes/
 A creative and abstract JavaScript gravitational simulator.
 
 Developed by HarryTortus (Mickey Williamson) with assistance from ChatGPT & Gemini.
-
-[Mickeywilliamson3d.com](https://mickeywilliamson3d.com)  
 [HarryTortus.itch.io](https://harrytortus.itch.io/)
+[Mickeywilliamson3d.com](https://mickeywilliamson3d.com)  
 
 ## About Orbital Shapes
 
