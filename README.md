@@ -13,7 +13,7 @@ Orbital Shapes is an interactive simulation that lets you explore the fascinatin
 
 ## Getting Started
 
-1. **Place Shapes:** Click anywhere on the black canvas to add a shape.  Experiment with different sizes and positions.
+1. **Place Shapes:** Click anywhere on the black canvas to add a shape. Experiment with different sizes and positions. (Maximum 100 shapes)
 2. **Shape Selection (Optional):** Choose from three different shapes by clicking on the icons in the bottom right corner.  If you don't select a shape, a circle will be the default shape.
 3. **Adjust Parameters (Optional):** Use the "Size," "Gravity," and "Randomize Movement" sliders to adjust the properties of new shapes and the overall simulation environment.  Experiment to see how these settings affect the gravitational interactions. Shapes are placed with a random color, rotation, movement direction and speed.
 4. **Start the Simulation:** Once you've placed some shapes and adjusted the parameters to your liking, click the "Play" button to begin the gravitational interactions.
