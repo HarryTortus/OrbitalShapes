@@ -1,7 +1,7 @@
 let shapes = [];
 let gravitySlider, lSystemSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.44"; // Updated version number
+let versionNumber = "0.45"; // Updated version number
 let selectedShape = 'circle';
 let motionActive = false;
 const MAX_SHAPES = 100;
@@ -84,7 +84,9 @@ function setup() {
             .style('height', '20px')
             .style('accent-color', '#3fd16b')
             .parent(container);
-        createSpan(labelText).style('color', 'white').parent(container);
+        createSpan(labelText).style('color', 'white')
+        .style('font-family', 'Arial')  // Set font to Arial
+        .parent(container);
         return slider;
     }
 
@@ -128,6 +130,7 @@ function setup() {
         .style('text-align', 'center')
         .style('display', 'block')
         .style('position', 'absolute')
+        .style('font-family', 'Arial')  // Set font to Arial
         .parent(controlContainer);
 
     setTimeout(() => {
@@ -142,8 +145,8 @@ function setup() {
 function draw() {
     background(0, 20);
     fill(255);
-    textSize(16);
-    text(`Version: ${versionNumber}`, 10, 30);
+    textSize(14);
+    text(`Version: ${versionNumber}`, 15, 20);
 
     if (motionActive) {
         for (let i = shapes.length - 1; i >= 0; i--) {
