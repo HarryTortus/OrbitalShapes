@@ -1,7 +1,7 @@
 let shapes = [];
 let gravitySlider, lSystemSlider, sizeSlider;
 let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.45"; // Updated version number
+let versionNumber = "0.46"; // Updated version number
 let selectedShape = 'circle';
 let motionActive = false;
 const MAX_SHAPES = 100;
@@ -166,6 +166,29 @@ function draw() {
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+}
+
+let touchStartX, touchStartY; // Store initial touch position
+
+function touchStarted() {
+    if (touches.length > 0 && mouseY < height - barHeight) { // Check if it's within the canvas
+        touchStartX = touches[0].x;
+        touchStartY = touches[0].y;
+        return false; // Prevent default touch behavior (like scrolling) if needed
+    }
+}
+
+function touchEnded() {
+    if (touches.length === 0 && touchStartX && touchStartY && mouseY < height - barHeight) { // Only trigger on release and within canvas
+        if (shapes.length >= MAX_SHAPES) {
+            shapes.shift();
+        }
+        let s = new Shape(touchStartX, touchStartY, selectedShape); // Use initial touch position
+        shapes.push(s);
+
+        touchStartX = null; // Reset for the next touch event
+        touchStartY = null;
+    }
 }
 
 function mousePressed() {
