@@ -18,7 +18,7 @@ Orbital Shapes is an interactive simulation that lets you explore the fascinatin
 3. **Adjust Parameters (Optional):** Use the "Size," "Gravity," and "Randomize Movement" sliders to adjust the properties of new shapes and the overall simulation environment.  Experiment to see how these settings affect the gravitational interactions. Shapes are placed with a random color, rotation, movement direction and speed.
 4. **Start the Simulation:** Once you've placed some shapes and adjusted the parameters to your liking, click the "Play" button to begin the gravitational interactions.
 5. **Observe and Explore:** Watch as the shapes interact, creating mesmerizing patterns and orbital paths.  Continue to experiment with different shapes and settings to discover new and interesting results.
-6. **Control the Simulation:** Use the "Pause" button to stop the simulation and the "Reset" button to clear the canvas and start over.
+6. **Control the Simulation:** Use the "Pause" button to stop the simulation and the "Reset" button to reset the canvas and and sliders.
 
 ## Controls
 
