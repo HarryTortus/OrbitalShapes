@@ -1,26 +1,26 @@
-// script.js for Orbital Shapes (Corrected Setup & Bouncy Border)
+// script.js for Orbital Shapes (Complete)
 
 let shapes = [];
-// HTML Element References (will be assigned in setupControls)
+// HTML Element References
 let gravitySliderEl, lSystemSliderEl, sizeSliderEl;
-let motionButtonEl, restartButtonEl, fullscreenButtonEl, bouncyBorderToggleEl;
+let motionButtonEl, restartButtonEl, fullscreenButtonEl;
 let circleButtonEl, squareButtonEl, triangleButtonEl;
-let p5Canvas; 
+let p5Canvas; // To hold the p5.js canvas element
 
-let versionNumber = "0.51"; // Updated version
-let selectedShape = 'circle'; 
+let versionNumber = "0.50"; // Updated version
+let selectedShape = 'circle'; // Default selected shape
 let motionActive = false;
 const MAX_SHAPES = 100;
 
+// App-specific settings
 const appSettings = {
-    backgroundColor: '#000000', 
+    backgroundColor: '#000000', // Canvas background for Orbital Shapes
     gravity: 2.5,
     randomize: 0,
     size: 20,
-    bouncyBorder: false 
 };
 
-// --- UTILITY FUNCTIONS ---
+// Helper to update the visual fill of range sliders
 function updateRangeSliderFill(inputElement) {
     if (!inputElement) return;
     const min = parseFloat(inputElement.min || 0);
@@ -30,115 +30,55 @@ function updateRangeSliderFill(inputElement) {
     inputElement.style.setProperty('--range-progress', `${percentage}%`);
 }
 
-// --- P5.JS SETUP & DRAW ---
 function setup() {
-    console.log("p5.js setup() called.");
     const canvasPlaceholder = document.getElementById('p5-canvas-placeholder');
-    p5Canvas = createCanvas(1, 1); 
+    p5Canvas = createCanvas(1, 1); // Create a 1x1 canvas initially
     if (canvasPlaceholder && p5Canvas) {
-        p5Canvas.parent(canvasPlaceholder); 
-        console.log("Canvas created and parented to #p5-canvas-placeholder.");
+        p5Canvas.parent(canvasPlaceholder); // Parent it to the placeholder
     } else {
-        console.error("FATAL: Canvas placeholder #p5-canvas-placeholder not found or p5.js canvas could not be created.");
-        // No field will appear if this happens.
-        return; 
+        console.error("Canvas placeholder not found or canvas could not be created.");
+        return;
     }
+
     frameRate(30);
-    
-    if (!setupControls()) { // If setupControls returns false, it means a critical error.
-        console.error("FATAL: setupControls() failed due to missing HTML elements. Field may not appear or function correctly.");
-        // We might still attempt to draw a canvas, but controls will be broken.
-        // For robustness, it might be better to halt or show an error to the user on the page.
-    }
-    
-    windowResized(); // Always call to size the canvas.
-    console.log("p5.js setup() finished.");
+    // Initial background draw will be handled by the first call to windowResized()
+
+    setupControls(); // Initialize and get references to HTML controls
+    windowResized(); // Call to set initial canvas size and draw background
 }
 
-function draw() {
-    let bgColor = appSettings.backgroundColor;
-    if (bgColor && bgColor.length === 7 && bgColor.startsWith('#')) { 
-        background(color(bgColor + '2A')); 
-    } else {
-        background(bgColor || '#000000'); 
-    }
-
-    if (motionActive) {
-        for (let i = shapes.length - 1; i >= 0; i--) {
-            shapes[i].update();
-            shapes[i].display();
-            if (!appSettings.bouncyBorder && shapes[i].isOffScreen()) {
-                shapes.splice(i, 1);
-            }
-        }
-    } else {
-        for (let shape of shapes) {
-            shape.display(); 
-        }
-    }
-}
-
-// --- CONTROL UI SETUP ---
 function setupControls() {
-    console.log("setupControls() called.");
-    let allControlsFound = true;
-
-    // Get elements and check each one immediately
+    // Get button elements
     motionButtonEl = document.getElementById('motionButton');
-    if (!motionButtonEl) { console.error("HTML Control Error: Element with ID 'motionButton' not found."); allControlsFound = false; }
-
     restartButtonEl = document.getElementById('restartButton');
-    if (!restartButtonEl) { console.error("HTML Control Error: Element with ID 'restartButton' not found."); allControlsFound = false; }
-
     fullscreenButtonEl = document.getElementById('fullscreenButton');
-    if (!fullscreenButtonEl) { console.error("HTML Control Error: Element with ID 'fullscreenButton' not found."); allControlsFound = false; }
 
-    bouncyBorderToggleEl = document.getElementById('bouncyBorderToggle');
-    if (!bouncyBorderToggleEl) { console.error("HTML Control Error: Element with ID 'bouncyBorderToggle' not found."); allControlsFound = false; }
-
+    // Get slider elements
     gravitySliderEl = document.getElementById('gravitySlider');
-    if (!gravitySliderEl) { console.error("HTML Control Error: Element with ID 'gravitySlider' not found."); allControlsFound = false; }
-
     lSystemSliderEl = document.getElementById('lSystemSlider');
-    if (!lSystemSliderEl) { console.error("HTML Control Error: Element with ID 'lSystemSlider' not found."); allControlsFound = false; }
-
     sizeSliderEl = document.getElementById('sizeSlider');
-    if (!sizeSliderEl) { console.error("HTML Control Error: Element with ID 'sizeSlider' not found."); allControlsFound = false; }
 
+    // Get shape selector button elements
     circleButtonEl = document.getElementById('circleButton');
-    if (!circleButtonEl) { console.error("HTML Control Error: Element with ID 'circleButton' not found."); allControlsFound = false; }
-
     squareButtonEl = document.getElementById('squareButton');
-    if (!squareButtonEl) { console.error("HTML Control Error: Element with ID 'squareButton' not found."); allControlsFound = false; }
-
     triangleButtonEl = document.getElementById('triangleButton');
-    if (!triangleButtonEl) { console.error("HTML Control Error: Element with ID 'triangleButton' not found."); allControlsFound = false; }
 
-    if (!allControlsFound) {
-        // If any critical element is missing, it's not safe to proceed with setting values or adding listeners.
-        return false; // Indicate setup failure
+    // Check if all elements were found (basic check)
+    if (!(motionButtonEl && restartButtonEl && fullscreenButtonEl && gravitySliderEl && lSystemSliderEl && sizeSliderEl && circleButtonEl && squareButtonEl && triangleButtonEl)) {
+        console.error("One or more control elements could not be found in the DOM. Check IDs.");
+        return; // Stop setup if critical elements are missing
     }
-    
-    // Initialize controls FROM THEIR HTML 'value' ATTRIBUTES or appSettings defaults
-    // This prevents errors if an element was technically found but something else is wrong with appSettings.
-    // The HTML should be the source of truth for initial default values where possible.
-    gravitySliderEl.value = appSettings.gravity; // This was the line causing the error if gravitySliderEl was null
-    lSystemSliderEl.value = appSettings.randomize;
-    sizeSliderEl.value = appSettings.size;
-    bouncyBorderToggleEl.checked = appSettings.bouncyBorder; 
 
-    // Update appSettings from the actual initial values of the controls
+    // Set initial values for sliders from appSettings or HTML default
     appSettings.gravity = parseFloat(gravitySliderEl.value);
     appSettings.randomize = parseFloat(lSystemSliderEl.value);
     appSettings.size = parseFloat(sizeSliderEl.value);
-    // bouncyBorder already set from appSettings.bouncyBorder
-
+    
     document.querySelectorAll('.controls input[type="range"]').forEach(slider => {
         updateSliderValueDisplay(slider);
         updateRangeSliderFill(slider); 
     });
     
-    // Event Listeners
     motionButtonEl.addEventListener('click', () => {
         motionActive = !motionActive;
         motionButtonEl.innerHTML = motionActive ? '⏸' : '▶';
@@ -146,17 +86,13 @@ function setupControls() {
 
     restartButtonEl.addEventListener('click', () => {
         shapes = [];
-        // Reset to default values defined in appSettings initial state
-        appSettings.gravity = 2.5; 
-        appSettings.randomize = 0;   
-        appSettings.size = 20;    
-        appSettings.bouncyBorder = false; 
+        gravitySliderEl.value = 2.5; 
+        lSystemSliderEl.value = 0;   
+        sizeSliderEl.value = 20;    
         
-        // Update HTML controls to reflect these defaults
-        gravitySliderEl.value = appSettings.gravity;
-        lSystemSliderEl.value = appSettings.randomize;
-        sizeSliderEl.value = appSettings.size;
-        bouncyBorderToggleEl.checked = appSettings.bouncyBorder;
+        appSettings.gravity = parseFloat(gravitySliderEl.value);
+        appSettings.randomize = parseFloat(lSystemSliderEl.value);
+        appSettings.size = parseFloat(sizeSliderEl.value);
 
         document.querySelectorAll('.controls input[type="range"]').forEach(slider => {
             updateSliderValueDisplay(slider);
@@ -165,7 +101,7 @@ function setupControls() {
         motionActive = false; 
         motionButtonEl.innerHTML = '▶';
         if (typeof background === 'function' && appSettings.backgroundColor) {
-            background(appSettings.backgroundColor); 
+            background(appSettings.backgroundColor); // Clear canvas
         }
     });
 
@@ -177,10 +113,6 @@ function setupControls() {
         }
     });
 
-    bouncyBorderToggleEl.addEventListener('change', () => {
-        appSettings.bouncyBorder = bouncyBorderToggleEl.checked;
-    });
-
     gravitySliderEl.addEventListener('input', () => handleSliderInput(gravitySliderEl, 'gravity'));
     lSystemSliderEl.addEventListener('input', () => handleSliderInput(lSystemSliderEl, 'randomize'));
     sizeSliderEl.addEventListener('input', () => handleSliderInput(sizeSliderEl, 'size'));
@@ -189,16 +121,14 @@ function setupControls() {
     squareButtonEl.addEventListener('click', () => selectShapeHandler('square'));
     triangleButtonEl.addEventListener('click', () => selectShapeHandler('triangle'));
 
-    updateShapeButtonVisuals(); 
+    updateShapeButtonVisuals(); // Initialize active shape button style
 
     const versionDisplayEl = document.getElementById('versionDisplay');
     if(versionDisplayEl) versionDisplayEl.textContent = `v${versionNumber}`;
 
     ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(event =>
-        document.addEventListener(event, windowResized)
+        document.addEventListener(event, () => windowResized())
     );
-    console.log("setupControls() finished successfully.");
-    return true; 
 }
 
 function handleSliderInput(sliderElement, settingName) {
@@ -212,15 +142,14 @@ function updateSliderValueDisplay(sliderElement) {
     const valueDisplayElement = document.getElementById(valueDisplayId);
     if (valueDisplayElement) {
         let value = parseFloat(sliderElement.value);
+        // Check if step is decimal to determine precision
         let step = parseFloat(sliderElement.step);
-        let decimalPlaces = 0;
-        if (step > 0 && step < 1) { 
-            const stepString = step.toString();
-            if (stepString.includes('.')) {
-                decimalPlaces = stepString.split('.')[1].length;
-            }
+        if (step > 0 && step < 1) { // If step is like 0.1, 0.01 etc.
+            let decimalPlaces = Math.max(0, (step.toString().split('.')[1] || '').length);
+            valueDisplayElement.textContent = value.toFixed(decimalPlaces);
+        } else {
+            valueDisplayElement.textContent = value.toFixed(0);
         }
-        valueDisplayElement.textContent = value.toFixed(decimalPlaces);
     }
 }
 
@@ -246,8 +175,33 @@ function updateShapeButtonVisuals() {
     });
 }
 
+function draw() {
+    // Use a hex alpha value for trails. '1A' is ~10% opacity, '33' is ~20%.
+    // For very subtle trails, try a lower alpha. For no trails, just use appSettings.backgroundColor.
+    let bgColor = appSettings.backgroundColor;
+    if (bgColor.length === 7) { // if it's #RRGGBB
+        background(color(bgColor + '2A')); // Appending alpha, e.g. #0000002A for subtle trails
+    } else {
+        background(bgColor); // Fallback if it's not a 6-digit hex
+    }
+
+
+    if (motionActive) {
+        for (let i = shapes.length - 1; i >= 0; i--) {
+            shapes[i].update();
+            shapes[i].display();
+            if (shapes[i].isOffScreen()) {
+                shapes.splice(i, 1);
+            }
+        }
+    } else {
+        for (let shape of shapes) {
+            shape.display(); 
+        }
+    }
+}
+
 function windowResized() {
-    console.log("windowResized() called.");
     const mainTitle = document.getElementById('mainTitle');
     const controlsPanel = document.getElementById('controlsPanel');
     const sketchContainer = document.getElementById('sketch-container');
@@ -255,13 +209,13 @@ function windowResized() {
 
     let newCanvasWidth, newCanvasHeight;
     
-    let canvasMarginBottom = 15; 
-    if (p5Canvas && p5Canvas.elt && p5Canvas.elt.parentNode) { 
-        const currentMargin = parseFloat(getComputedStyle(p5Canvas.elt).marginBottom);
-        if (!isNaN(currentMargin)) {
-            canvasMarginBottom = currentMargin;
-        }
+    // Try to get actual margin from canvas if it exists, otherwise default
+    let canvasMarginBottom = 15; // Default
+    const canvasEl = document.querySelector('#p5-canvas-placeholder canvas');
+    if (canvasEl && sketchContainer) { // Ensure sketchContainer also exists for context
+        canvasMarginBottom = parseFloat(getComputedStyle(canvasEl).marginBottom);
     }
+
 
     if (document.fullscreenElement) {
         document.body.classList.add('fullscreen-active');
@@ -270,13 +224,14 @@ function windowResized() {
     } else {
         document.body.classList.remove('fullscreen-active');
 
-        if (!sketchContainer) { 
-             console.error("Sketch container not found during resize! Using fallback dimensions.");
-             newCanvasWidth = Math.max(50, window.innerWidth * 0.8); 
-             newCanvasHeight = Math.max(50, window.innerHeight * 0.5);
+        if (!sketchContainer) { // Guard against missing sketchContainer
+             console.error("Sketch container not found during resize.");
+             newCanvasWidth = window.innerWidth * 0.8; // Fallback
+             newCanvasHeight = window.innerHeight * 0.5; // Fallback
         } else {
             newCanvasWidth = sketchContainer.clientWidth; 
         }
+
 
         const titleStyle = mainTitle ? window.getComputedStyle(mainTitle) : { marginTop: '0px', marginBottom: '0px' };
         const titleHeight = mainTitle ? (mainTitle.offsetHeight + parseFloat(titleStyle.marginTop) + parseFloat(titleStyle.marginBottom)) : 0;
@@ -293,126 +248,145 @@ function windowResized() {
         let availableHeightForCanvasBlock = window.innerHeight - bodyVerticalPadding - titleHeight - controlsHeight - footerTotalHeight;
         let maxCanvasHeight = availableHeightForCanvasBlock - canvasMarginBottom;
 
-        newCanvasHeight = maxCanvasHeight; 
+        newCanvasHeight = maxCanvasHeight; // Fill available vertical space
         
         newCanvasWidth = Math.max(50, newCanvasWidth); 
-        newCanvasHeight = Math.max(50, Math.min(4000, newCanvasHeight)); 
+        newCanvasHeight = Math.max(50, Math.min(4000, newCanvasHeight)); // Min height 50, Max reasonable height
     }
 
-    if (typeof resizeCanvas === 'function') {
+    if (typeof resizeCanvas === 'function') { // p5.js global mode
         resizeCanvas(newCanvasWidth, newCanvasHeight);
     }
     
     if (typeof background === 'function' && appSettings && appSettings.backgroundColor) {
       background(appSettings.backgroundColor); 
     }
-    console.log("windowResized() finished, canvas: " + newCanvasWidth + "x" + newCanvasHeight);
 }
 
-// --- MOUSE & TOUCH INPUT ---
+// Original Interaction Logic (mouse/touch)
 function mousePressed() {
-    if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) { 
+    if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) { // Check canvas bounds
         if (shapes.length >= MAX_SHAPES) {
             shapes.shift(); 
         }
         let s = new Shape(mouseX, mouseY, selectedShape);
         shapes.push(s);
-        return false; 
+        return false; // Prevent default browser actions
     }
 }
 
-let touchStartX, touchStartY; 
+let touchStartX, touchStartY; // Store initial touch position for tap-like behavior
 
 function touchStarted() {
     if (touches.length > 0) {
         const touchX = touches[0].x;
         const touchY = touches[0].y;
-        if (touchX > 0 && touchX < width && touchY > 0 && touchY < height) { 
-            touchStartX = touchX; 
+        if (touchX > 0 && touchX < width && touchY > 0 && touchY < height) { // Check canvas bounds
+            touchStartX = touchX; // Store start position for a tap
             touchStartY = touchY;
-            return false; 
+            // Spawning on touchEnd now to avoid issues with multi-touch or drag attempts
+            return false; // Prevent default actions like scrolling
         }
     }
 }
 
 function touchEnded() {
+    // Check if it was a simple tap (no significant movement from touchStartX/Y)
+    // and if touchStartX/Y were set (meaning touchStarted inside canvas)
     if (touchStartX !== undefined && touchStartY !== undefined && touches.length === 0) { 
+        // You might add a small threshold here if you want to allow minor drag for a tap
+        // For now, any release after a start inside canvas is a tap.
         if (shapes.length >= MAX_SHAPES) {
             shapes.shift();
         }
         let s = new Shape(touchStartX, touchStartY, selectedShape);
         shapes.push(s);
     }
+    // Reset touch start coordinates
     touchStartX = undefined;
     touchStartY = undefined;
 }
 
 
-// --- SHAPE CLASS ---
+// Shape class (using appSettings for slider values)
 class Shape {
     constructor(x, y, type) {
         this.x = x;
         this.y = y;
         this.type = type;
-        this.size = appSettings.size; 
+        this.size = appSettings.size; // Use global appSettings
         this.updateMass();
         this.velX = random(-0.5, 0.5);
         this.velY = random(-0.5, 0.5);
-        // Vibrant colors
-        this.color = color(random(200, 255), random(200, 255), random(200, 255)); 
+        this.color = color(random(180, 255), random(180, 255), random(180, 255), 220); // Brighter, slightly less alpha
         this.rotation = random(TWO_PI);
-        this.rotationSpeed = random(-0.03, 0.03); 
+        this.rotationSpeed = random(-0.03, 0.03); // Slightly slower rotation
     }
 
-    updateMass() { /* ... (same as previous working version) ... */ }
+    updateMass() {
+        // Using a more area-proportional mass, then scaled
+        let area;
+        if (this.type === 'circle') {
+            area = PI * pow(this.size / 2, 2);
+        } else if (this.type === 'square') {
+            area = pow(this.size, 2);
+        } else if (this.type === 'triangle') {
+            // Area of equilateral triangle: (sqrt(3)/4) * side^2. Assuming this.size is related to side.
+            // For simplicity, treat it similar to square/circle for now or use a rough factor.
+            area = (sqrt(3) / 4) * pow(this.size, 2); 
+        } else {
+            area = pow(this.size, 2); // Default
+        }
+        this.mass = constrain(area / 200, 0.5, 50); // Scaled and constrained mass
+    }
 
     update() {
-        // 1. Apply Forces (Gravity, Randomize)
-        // ... (Gravity and Randomize logic from previous working version) ...
-        // Gravity:
+        // Gravitational pull
         for (let other of shapes) {
             if (other !== this) {
                 let dx = other.x - this.x;
                 let dy = other.y - this.y;
                 let distance = sqrt(dx * dx + dy * dy);
-                let minInteractionDistance = (this.size + other.size) / 4; // Example value
+                
+                // Prevent extreme forces at very small distances / division by zero
+                let minInteractionDistance = (this.size + other.size) / 4; // Allow closer interaction before clamping
                 distance = max(distance, minInteractionDistance); 
                 
                 let forceMagnitude = (appSettings.gravity * this.mass * other.mass) / (distance * distance);
                 
-                if (distance < (this.size + other.size) / 2.5) { 
-                   forceMagnitude = -forceMagnitude * 0.5; 
+                // Simple collision/overlap based repulsion (stronger if very close)
+                if (distance < (this.size + other.size) / 2) { 
+                   forceMagnitude = -forceMagnitude * 2; // Repulsive force if overlapping
                 }
 
                 let angle = atan2(dy, dx);
                 let forceX = cos(angle) * forceMagnitude;
                 let forceY = sin(angle) * forceMagnitude;
+
                 this.velX += forceX / this.mass;
                 this.velY += forceY / this.mass;
+                // Simpler gravity - not applying equal/opposite to others to make it less chaotic
             }
         }
-        // Randomize:
-        const noiseStrength = appSettings.randomize * 0.005; 
+
+        // Randomize Movement
+        const noiseStrength = appSettings.randomize * 0.005; // Adjusted strength
         this.velX += (noise(this.x * 0.01, this.y * 0.01, frameCount * 0.005) - 0.5) * noiseStrength;
         this.velY += (noise(this.x * 0.01 + 100, this.y * 0.01 + 100, frameCount * 0.005) - 0.5) * noiseStrength;
 
-
-        // 2. Speed Limit
-        // ... (Speed limit logic from previous working version) ...
-        const maxSpeed = 2.5 + appSettings.gravity * 0.5; 
+        // Speed limit
+        const maxSpeed = 3 + appSettings.gravity; // Max speed can increase slightly with gravity
         let currentSpeed = sqrt(this.velX * this.velX + this.velY * this.velY);
         if (currentSpeed > maxSpeed) {
             this.velX = (this.velX / currentSpeed) * maxSpeed;
             this.velY = (this.velY / currentSpeed) * maxSpeed;
         }
 
-
-        // 3. Update Position
         this.x += this.velX;
         this.y += this.velY;
         this.rotation += this.rotationSpeed;
 
-        // 4. Inter-Shape Collisions (ALWAYS ON)
+        // Collision with other shapes (more detailed elastic collision)
         for (let other of shapes) {
             if (other !== this) {
                 let dx = other.x - this.x;
@@ -420,26 +394,30 @@ class Shape {
                 let distCenter = sqrt(dx * dx + dy * dy);
                 let minDist = (this.size + other.size) / 2;
 
-                if (distCenter < minDist && distCenter > 0.001) { 
+                if (distCenter < minDist && distCenter > 0) { // Added distCenter > 0
+                    // Resolve overlap first
                     let overlap = (minDist - distCenter);
-                    let normalX = dx / distCenter;
-                    let normalY = dy / distCenter;
-                    
-                    let moveX = normalX * overlap * 0.5; 
-                    let moveY = normalY * overlap * 0.5;
+                    let angle = atan2(dy, dx); // dx and dy are from this to other
+                    let moveX = cos(angle) * overlap * 0.5; // move 'this' away from 'other'
+                    let moveY = sin(angle) * overlap * 0.5;
 
                     this.x -= moveX; this.y -= moveY;
                     other.x += moveX; other.y += moveY;
 
+                    // Elastic collision response
+                    let normalX = dx / distCenter; // Normal from this to other
+                    let normalY = dy / distCenter;
                     let relVelX = this.velX - other.velX;
                     let relVelY = this.velY - other.velY;
                     let velAlongNormal = relVelX * normalX + relVelY * normalY;
 
-                    if (velAlongNormal > 0) continue; 
+                    if (velAlongNormal > 0) continue; // Objects are already moving apart along this normal
 
-                    let restitution = 0.75; 
+                    let restitution = 0.8; // Coefficient of restitution
+                    // Total mass for impulse calculation: 1/m1 + 1/m2 = (m1+m2)/(m1*m2)
+                    // Impulse magnitude j = -(1+e) * velAlongNormal / (1/m1 + 1/m2)
                     let invMassSum = (1 / this.mass) + (1 / other.mass);
-                    if (invMassSum <= 0) invMassSum = 0.0001; 
+                    if (invMassSum === 0) continue; // Avoid division by zero if masses are infinite (should not happen here)
                     
                     let impulse = (-(1 + restitution) * velAlongNormal) / invMassSum;
                     
@@ -453,31 +431,10 @@ class Shape {
                 }
             }
         }
-        
-        // 5. Bouncy Border Logic (Conditional Deflection)
-        if (appSettings.bouncyBorder) {
-            const radius = this.size / 2; 
-
-            if (this.x - radius < 0 && this.velX < 0) { // Moving left and hitting left wall
-                this.x = radius;        // Correct position
-                this.velX *= -1;        // Simple deflection (reverse horizontal velocity)
-            } else if (this.x + radius > width && this.velX > 0) { // Moving right and hitting right wall
-                this.x = width - radius; // Correct position
-                this.velX *= -1;        // Simple deflection
-            }
-
-            if (this.y - radius < 0 && this.velY < 0) { // Moving up and hitting top wall
-                this.y = radius;        // Correct position
-                this.velY *= -1;        // Simple deflection (reverse vertical velocity)
-            } else if (this.y + radius > height && this.velY > 0) { // Moving down and hitting bottom wall
-                this.y = height - radius; // Correct position
-                this.velY *= -1;        // Simple deflection
-            }
-        }
     }
 
     isOffScreen() {
-        const margin = this.size * 1.5; 
+        const margin = this.size * 1.5; // Adjusted margin
         return (
             this.x + margin < 0 ||
             this.x - margin > width ||
@@ -498,9 +455,16 @@ class Shape {
         } else if (this.type === 'square') {
             rect(0, 0, this.size, this.size);
         } else if (this.type === 'triangle') {
-            let h = this.size * (sqrt(3)/2); 
-            triangle(0, -h * 2/3, -this.size/2, h * 1/3, this.size/2, h * 1/3);
+            let r = this.size * 0.577; // Factor to make equilateral triangle side roughly 'this.size'
+            triangle(0, -r * 2/sqrt(3) * 0.866,  // Top point
+                    -r, r / sqrt(3) * 0.866,      // Bottom-left
+                     r, r / sqrt(3) * 0.866);     // Bottom-right
         }
         pop();
     }
 }
+
+// Helper function (if needed elsewhere, currently not used by this revised script)
+// function clamp(value, min, max) {
+//     return Math.max(min, Math.min(max, value));
+// }
