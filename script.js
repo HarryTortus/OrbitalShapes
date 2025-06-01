@@ -1,27 +1,26 @@
-// script.js for Orbital Shapes (v0.51 - Bouncy Border & Vibrancy)
+// script.js for Orbital Shapes (v0.52 - Text Buttons, Bouncy Border, Vibrant Colors)
 
 let shapes = [];
 // HTML Element References
 let gravitySliderEl, lSystemSliderEl, sizeSliderEl;
-let motionButtonEl, restartButtonEl, fullscreenButtonEl, bouncyBorderToggleEl; // Added bouncyBorderToggleEl
+let motionButtonEl, restartButtonEl, fullscreenButtonEl, bouncyBorderToggleEl;
 let circleButtonEl, squareButtonEl, triangleButtonEl;
 let p5Canvas; 
 
-let versionNumber = "0.51"; // Updated version
+let versionNumber = "0.52"; // Updated version
 let selectedShape = 'circle'; 
 let motionActive = false;
 const MAX_SHAPES = 100;
 
-// App-specific settings
 const appSettings = {
     backgroundColor: '#000000', 
     gravity: 2.5,
     randomize: 0,
     size: 20,
-    bouncyBorder: false // New setting for bouncy border
+    bouncyBorder: false 
 };
 
-// Helper to update the visual fill of range sliders
+// --- UTILITY FUNCTIONS ---
 function updateRangeSliderFill(inputElement) {
     if (!inputElement) return;
     const min = parseFloat(inputElement.min || 0);
@@ -31,51 +30,103 @@ function updateRangeSliderFill(inputElement) {
     inputElement.style.setProperty('--range-progress', `${percentage}%`);
 }
 
+// --- P5.JS SETUP & DRAW ---
 function setup() {
+    console.log("p5.js setup() called.");
     const canvasPlaceholder = document.getElementById('p5-canvas-placeholder');
     p5Canvas = createCanvas(1, 1); 
     if (canvasPlaceholder && p5Canvas) {
         p5Canvas.parent(canvasPlaceholder); 
+        console.log("Canvas created and parented to #p5-canvas-placeholder.");
     } else {
-        console.error("Canvas placeholder not found or canvas could not be created.");
-        return;
+        console.error("FATAL: Canvas placeholder #p5-canvas-placeholder not found or p5.js canvas could not be created.");
+        return; 
     }
     frameRate(30);
-    setupControls(); 
+    
+    if (!setupControls()) { 
+        console.error("FATAL: setupControls() failed. Field may not appear or function correctly.");
+    }
+    
     windowResized(); 
+    console.log("p5.js setup() finished.");
 }
 
-function setupControls() {
-    // ... (getting all element references, including bouncyBorderToggleEl) ...
-    // ALL THE GET ELEMENT BY ID CALLS from your v0.50 script are still needed here.
-    // For example:
-    motionButtonEl = document.getElementById('motionButton');
-    restartButtonEl = document.getElementById('restartButton');
-    fullscreenButtonEl = document.getElementById('fullscreenButton');
-    bouncyBorderToggleEl = document.getElementById('bouncyBorderToggle'); 
-    gravitySliderEl = document.getElementById('gravitySlider');
-    lSystemSliderEl = document.getElementById('lSystemSlider');
-    sizeSliderEl = document.getElementById('sizeSlider');
-    circleButtonEl = document.getElementById('circleButton');
-    squareButtonEl = document.getElementById('squareButton');
-    triangleButtonEl = document.getElementById('triangleButton');
-
-    // Basic check for critical elements
-    if (!motionButtonEl || !restartButtonEl || !fullscreenButtonEl || !gravitySliderEl /*...etc for all*/) {
-        console.error("One or more control elements are missing. UI will be broken.");
-        return false; 
+function draw() {
+    let bgColor = appSettings.backgroundColor;
+    if (bgColor && bgColor.length === 7 && bgColor.startsWith('#')) { 
+        background(color(bgColor + '2A')); 
+    } else {
+        background(bgColor || '#000000'); 
     }
 
-    // ... (Initializing slider values and appSettings as before) ...
+    if (motionActive) {
+        for (let i = shapes.length - 1; i >= 0; i--) {
+            shapes[i].update();
+            shapes[i].display();
+            if (!appSettings.bouncyBorder && shapes[i].isOffScreen()) {
+                shapes.splice(i, 1);
+            }
+        }
+    } else {
+        for (let shape of shapes) {
+            shape.display(); 
+        }
+    }
+}
+
+// --- CONTROL UI SETUP ---
+function setupControls() {
+    console.log("setupControls() called.");
+    let allControlsFound = true;
+
+    // Get elements and check each one immediately
+    motionButtonEl = document.getElementById('motionButton');
+    if (!motionButtonEl) { console.error("HTML Control Error: Element with ID 'motionButton' not found."); allControlsFound = false; }
+
+    restartButtonEl = document.getElementById('restartButton');
+    if (!restartButtonEl) { console.error("HTML Control Error: Element with ID 'restartButton' not found."); allControlsFound = false; }
+
+    fullscreenButtonEl = document.getElementById('fullscreenButton');
+    if (!fullscreenButtonEl) { console.error("HTML Control Error: Element with ID 'fullscreenButton' not found."); allControlsFound = false; }
+
+    bouncyBorderToggleEl = document.getElementById('bouncyBorderToggle');
+    if (!bouncyBorderToggleEl) { console.error("HTML Control Error: Element with ID 'bouncyBorderToggle' not found."); allControlsFound = false; }
+
+    gravitySliderEl = document.getElementById('gravitySlider');
+    if (!gravitySliderEl) { console.error("HTML Control Error: Element with ID 'gravitySlider' not found."); allControlsFound = false; }
+
+    lSystemSliderEl = document.getElementById('lSystemSlider');
+    if (!lSystemSliderEl) { console.error("HTML Control Error: Element with ID 'lSystemSlider' not found."); allControlsFound = false; }
+
+    sizeSliderEl = document.getElementById('sizeSlider');
+    if (!sizeSliderEl) { console.error("HTML Control Error: Element with ID 'sizeSlider' not found."); allControlsFound = false; }
+
+    circleButtonEl = document.getElementById('circleButton');
+    if (!circleButtonEl) { console.error("HTML Control Error: Element with ID 'circleButton' not found."); allControlsFound = false; }
+
+    squareButtonEl = document.getElementById('squareButton');
+    if (!squareButtonEl) { console.error("HTML Control Error: Element with ID 'squareButton' not found."); allControlsFound = false; }
+
+    triangleButtonEl = document.getElementById('triangleButton');
+    if (!triangleButtonEl) { console.error("HTML Control Error: Element with ID 'triangleButton' not found."); allControlsFound = false; }
+
+    if (!allControlsFound) {
+        return false; 
+    }
+    
+    // Initialize appSettings from HTML control values where appropriate, or set controls from appSettings
+    gravitySliderEl.value = appSettings.gravity;
+    lSystemSliderEl.value = appSettings.randomize;
+    sizeSliderEl.value = appSettings.size;
+    bouncyBorderToggleEl.checked = appSettings.bouncyBorder; 
+
+    // Update appSettings from the actual initial values of the controls IF they differ from defaults
     appSettings.gravity = parseFloat(gravitySliderEl.value);
     appSettings.randomize = parseFloat(lSystemSliderEl.value);
     appSettings.size = parseFloat(sizeSliderEl.value);
-    if (bouncyBorderToggleEl) { // Check if toggle exists before accessing property
-        bouncyBorderToggleEl.checked = appSettings.bouncyBorder;
-    } else {
-        console.warn("Bouncy border toggle element not found during setup.");
-    }
-    
+    // appSettings.bouncyBorder is already set from its default or from checkbox if needed
+
     document.querySelectorAll('.controls input[type="range"]').forEach(slider => {
         updateSliderValueDisplay(slider);
         updateRangeSliderFill(slider); 
@@ -84,22 +135,25 @@ function setupControls() {
     // Event Listeners
     motionButtonEl.addEventListener('click', () => {
         motionActive = !motionActive;
-        // Update button text based on motionActive state
         motionButtonEl.innerHTML = motionActive ? 'Pause' : 'Play'; // TEXT CHANGE HERE
     });
+    // Set initial text for motion button (HTML defaults to "Play")
+    motionButtonEl.innerHTML = motionActive ? 'Pause' : 'Play';
+
 
     restartButtonEl.addEventListener('click', () => {
-        // ... (existing restart logic from your v0.50 + bouncy border reset) ...
         shapes = [];
+        // Reset to default values defined in appSettings initial state
         appSettings.gravity = 2.5; 
         appSettings.randomize = 0;   
         appSettings.size = 20;    
         appSettings.bouncyBorder = false; 
         
+        // Update HTML controls to reflect these defaults
         gravitySliderEl.value = appSettings.gravity;
         lSystemSliderEl.value = appSettings.randomize;
         sizeSliderEl.value = appSettings.size;
-        if (bouncyBorderToggleEl) bouncyBorderToggleEl.checked = appSettings.bouncyBorder;
+        bouncyBorderToggleEl.checked = appSettings.bouncyBorder;
 
         document.querySelectorAll('.controls input[type="range"]').forEach(slider => {
             updateSliderValueDisplay(slider);
@@ -112,20 +166,18 @@ function setupControls() {
         }
     });
 
-    // Initialize motion button text correctly (it defaults to "Play" in HTML now)
-    if (motionButtonEl) motionButtonEl.innerHTML = motionActive ? 'Pause' : 'Play';
+    fullscreenButtonEl.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => console.error(`Fullscreen error: ${err.message} (${err.name})`));
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+        }
+    });
 
+    bouncyBorderToggleEl.addEventListener('change', () => {
+        appSettings.bouncyBorder = bouncyBorderToggleEl.checked;
+    });
 
-    fullscreenButtonEl.addEventListener('click', () => { /* ... (same fullscreen logic) ... */ });
-
-    if (bouncyBorderToggleEl) {
-        bouncyBorderToggleEl.addEventListener('change', () => {
-            appSettings.bouncyBorder = bouncyBorderToggleEl.checked;
-        });
-    }
-
-    // ... (rest of slider and shape button event listeners are the same) ...
-    // ... (updateShapeButtonVisuals, versionDisplay, fullscreen change listeners) ...
     gravitySliderEl.addEventListener('input', () => handleSliderInput(gravitySliderEl, 'gravity'));
     lSystemSliderEl.addEventListener('input', () => handleSliderInput(lSystemSliderEl, 'randomize'));
     sizeSliderEl.addEventListener('input', () => handleSliderInput(sizeSliderEl, 'size'));
@@ -142,8 +194,8 @@ function setupControls() {
     ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(event =>
         document.addEventListener(event, windowResized)
     );
-
-    return true;
+    console.log("setupControls() finished successfully.");
+    return true; 
 }
 
 function handleSliderInput(sliderElement, settingName) {
@@ -191,31 +243,8 @@ function updateShapeButtonVisuals() {
     });
 }
 
-function draw() {
-    let bgColor = appSettings.backgroundColor;
-    if (bgColor.length === 7) { 
-        background(color(bgColor + '2A')); 
-    } else {
-        background(bgColor); 
-    }
-
-    if (motionActive) {
-        for (let i = shapes.length - 1; i >= 0; i--) {
-            shapes[i].update();
-            shapes[i].display();
-            // Remove shapes if they go off-screen AND bouncy borders are OFF
-            if (!appSettings.bouncyBorder && shapes[i].isOffScreen()) {
-                shapes.splice(i, 1);
-            }
-        }
-    } else {
-        for (let shape of shapes) {
-            shape.display(); 
-        }
-    }
-}
-
 function windowResized() {
+    console.log("windowResized() called.");
     const mainTitle = document.getElementById('mainTitle');
     const controlsPanel = document.getElementById('controlsPanel');
     const sketchContainer = document.getElementById('sketch-container');
@@ -224,12 +253,12 @@ function windowResized() {
     let newCanvasWidth, newCanvasHeight;
     
     let canvasMarginBottom = 15; 
-    const canvasEl = document.querySelector('#p5-canvas-placeholder canvas');
-    if (canvasEl && sketchContainer) { 
-        canvasMarginBottom = parseFloat(getComputedStyle(canvasEl).marginBottom);
-        if(isNaN(canvasMarginBottom)) canvasMarginBottom = 15; // Fallback if parse fails
+    if (p5Canvas && p5Canvas.elt && p5Canvas.elt.parentNode) { 
+        const currentMargin = parseFloat(getComputedStyle(p5Canvas.elt).marginBottom);
+        if (!isNaN(currentMargin)) {
+            canvasMarginBottom = currentMargin;
+        }
     }
-
 
     if (document.fullscreenElement) {
         document.body.classList.add('fullscreen-active');
@@ -239,9 +268,9 @@ function windowResized() {
         document.body.classList.remove('fullscreen-active');
 
         if (!sketchContainer) { 
-             console.error("Sketch container not found during resize.");
-             newCanvasWidth = window.innerWidth * 0.8; 
-             newCanvasHeight = window.innerHeight * 0.5; 
+             console.error("Sketch container not found during resize! Using fallback dimensions.");
+             newCanvasWidth = Math.max(50, window.innerWidth * 0.8); 
+             newCanvasHeight = Math.max(50, window.innerHeight * 0.5);
         } else {
             newCanvasWidth = sketchContainer.clientWidth; 
         }
@@ -267,15 +296,17 @@ function windowResized() {
         newCanvasHeight = Math.max(50, Math.min(4000, newCanvasHeight)); 
     }
 
-    if (typeof resizeCanvas === 'function') { 
+    if (typeof resizeCanvas === 'function') {
         resizeCanvas(newCanvasWidth, newCanvasHeight);
     }
     
     if (typeof background === 'function' && appSettings && appSettings.backgroundColor) {
       background(appSettings.backgroundColor); 
     }
+    console.log("windowResized() finished, canvas: " + newCanvasWidth + "x" + newCanvasHeight);
 }
 
+// --- MOUSE & TOUCH INPUT ---
 function mousePressed() {
     if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) { 
         if (shapes.length >= MAX_SHAPES) {
@@ -314,7 +345,7 @@ function touchEnded() {
 }
 
 
-// Shape class (using appSettings for slider values)
+// --- SHAPE CLASS ---
 class Shape {
     constructor(x, y, type) {
         this.x = x;
@@ -325,11 +356,10 @@ class Shape {
         this.velX = random(-0.5, 0.5);
         this.velY = random(-0.5, 0.5);
         
-        // VIBRANT COLORS using HSB mode
-        push(); // Isolate colorMode change
-        colorMode(HSB, 360, 100, 100); // Hue, Saturation, Brightness (max values)
-        this.color = color(random(360), 90 + random(10), 90 + random(10) ); // Random hue, high saturation & brightness
-        pop(); // Restore previous colorMode (usually RGB by default after this)
+        push(); 
+        colorMode(HSB, 360, 100, 100); 
+        this.color = color(random(360), 90 + random(10), 90 + random(10) ); 
+        pop(); 
 
         this.rotation = random(TWO_PI);
         this.rotationSpeed = random(-0.03, 0.03); 
@@ -350,7 +380,7 @@ class Shape {
     }
 
     update() {
-        // 1. Apply Forces (Gravity, Randomize) - (Same as your v0.50)
+        // 1. Apply Forces (Gravity, Randomize)
         for (let other of shapes) {
             if (other !== this) {
                 let dx = other.x - this.x;
@@ -359,8 +389,8 @@ class Shape {
                 let minInteractionDistance = (this.size + other.size) / 4; 
                 distance = max(distance, minInteractionDistance); 
                 let forceMagnitude = (appSettings.gravity * this.mass * other.mass) / (distance * distance);
-                if (distance < (this.size + other.size) / 2) { 
-                   forceMagnitude = -forceMagnitude * 2; 
+                if (distance < (this.size + other.size) / 2.5) { 
+                   forceMagnitude = -forceMagnitude * 0.5; 
                 }
                 let angle = atan2(dy, dx);
                 let forceX = cos(angle) * forceMagnitude;
@@ -373,8 +403,8 @@ class Shape {
         this.velX += (noise(this.x * 0.01, this.y * 0.01, frameCount * 0.005) - 0.5) * noiseStrength;
         this.velY += (noise(this.x * 0.01 + 100, this.y * 0.01 + 100, frameCount * 0.005) - 0.5) * noiseStrength;
 
-        // 2. Speed Limit - (Same as your v0.50)
-        const maxSpeed = 3 + appSettings.gravity; 
+        // 2. Speed Limit
+        const maxSpeed = 2.5 + appSettings.gravity * 0.5; 
         let currentSpeed = sqrt(this.velX * this.velX + this.velY * this.velY);
         if (currentSpeed > maxSpeed) {
             this.velX = (this.velX / currentSpeed) * maxSpeed;
@@ -386,7 +416,7 @@ class Shape {
         this.y += this.velY;
         this.rotation += this.rotationSpeed;
 
-        // 4. Inter-Shape Collisions (ALWAYS ON) - (Same as your v0.50)
+        // 4. Inter-Shape Collisions (ALWAYS ON)
         for (let other of shapes) {
             if (other !== this) {
                 let dx = other.x - this.x;
@@ -406,7 +436,7 @@ class Shape {
                     let relVelY = this.velY - other.velY;
                     let velAlongNormal = relVelX * normalX + relVelY * normalY;
                     if (velAlongNormal > 0) continue; 
-                    let restitution = 0.8; 
+                    let restitution = 0.75; 
                     let invMassSum = (1 / this.mass) + (1 / other.mass);
                     if (invMassSum <= 0) invMassSum = 0.0001; 
                     let impulse = (-(1 + restitution) * velAlongNormal) / invMassSum;
@@ -420,10 +450,9 @@ class Shape {
             }
         }
         
-        // 5. Bouncy Border Logic (Conditional Deflection) - NEW
+        // 5. Bouncy Border Logic (Conditional Deflection)
         if (appSettings.bouncyBorder) {
             const radius = this.size / 2; 
-
             if (this.x - radius < 0 && this.velX < 0) { 
                 this.x = radius;        
                 this.velX *= -1;        
@@ -431,7 +460,6 @@ class Shape {
                 this.x = width - radius; 
                 this.velX *= -1;        
             }
-
             if (this.y - radius < 0 && this.velY < 0) { 
                 this.y = radius;        
                 this.velY *= -1;        
@@ -452,9 +480,9 @@ class Shape {
         );
     }
 
-    display() { // Same as your v0.50
+    display() { 
         noStroke();
-        fill(this.color); // This will now use the vibrant HSB-defined color
+        fill(this.color); 
         push();
         translate(this.x, this.y);
         rotate(this.rotation);
