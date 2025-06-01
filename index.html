@@ -6,6 +6,7 @@
     <title>Orbital Shapes</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* ... (All existing CSS from the previous version remains the same) ... */
         :root {
             --page-bg: #ede3df; 
             --text-on-page-bg: #3b4c1a; 
@@ -97,13 +98,12 @@
         }
 
         .controls .control-group {
-            display: flex; /* Base for items within a group */
-            flex-wrap: wrap; /* Allow items (buttons, labels) to wrap if needed */
+            display: flex;
+            flex-wrap: wrap; 
             gap: 8px 12px; 
-            justify-content: center; /* Center items like buttons in their row */
+            justify-content: center;
             align-items: center;
             padding: 4px 0; 
-            /* width: auto; Let groups size to content unless they need to stack */
         }
 
         .controls label {
@@ -113,7 +113,16 @@
             white-space: nowrap;
             gap: 6px; 
             color: var(--text-on-control-panel);
+            cursor: pointer; /* Make label clickable for checkbox */
         }
+         .controls input[type="checkbox"] {
+            transform: scale(1.1);
+            margin-left: 2px; /* Align with other inputs */
+            margin-right: 4px;
+            accent-color: var(--text-on-page-bg); /* Line Flow green for checkbox color */
+            cursor: pointer;
+        }
+
 
         /* SLIDERS - Using Line Flow color scheme */
         .controls input[type="range"] {
@@ -237,27 +246,24 @@
         #site-footer a:hover { text-decoration: underline; }
         #site-footer #versionDisplay { color: var(--text-on-page-bg); }
         
-        /* MEDIA QUERIES - Revised for Control Group stacking */
         @media (max-width: 600px) { 
             .main-title { font-size: 2em; margin-bottom: 15px; }
             .controls { 
                 padding: 8px; 
-                gap: 10px; /* Gap between stacked groups */
-                flex-direction: column; /* Stack control groups */
+                gap: 10px; 
+                flex-direction: column; 
             }
             
-            /* Default for control groups when controls are stacked */
             .controls .control-group {
-                width: 100%; /* Make each group take full width */
-                padding: 6px 0; /* Adjust padding for stacked groups */
-                justify-content: center; /* Center content within the full-width group */
+                width: 100%; 
+                padding: 6px 0; 
+                justify-content: center; 
             }
 
-            /* Slider group specifically stacks its label/input pairs */
             .controls .control-group.slider-group {
-                flex-direction: column; /* Stack labels/sliders */
-                align-items: center; /* Center the stacked items */
-                gap: 12px; /* Gap between label/slider pairs */
+                flex-direction: column; 
+                align-items: center; 
+                gap: 12px; 
             }
             .controls .control-group.slider-group label { 
                 width: 100%; 
@@ -266,12 +272,11 @@
                 margin: 0 auto;
             }
 
-            /* Button groups try to keep buttons in a row, centered */
             .controls .control-group.action-buttons,
             .controls .control-group.shape-selector {
-                flex-direction: row; /* Keep buttons side-by-side */
-                flex-wrap: wrap; /* Allow buttons to wrap if necessary */
-                justify-content: center; /* Center the buttons */
+                flex-direction: row; 
+                flex-wrap: wrap; 
+                justify-content: center; 
             }
 
             .controls input[type="range"] { width: 120px; }
@@ -300,6 +305,10 @@
                 <button id="motionButton" title="Play/Pause Animation">▶</button>
                 <button id="restartButton" title="Reset Simulation">⟳</button>
                 <button id="fullscreenButton" title="Toggle Fullscreen">FS</button>
+                <label title="Toggle Bouncy Borders">
+                    <input type="checkbox" id="bouncyBorderToggle">
+                    Bouncy
+                </label>
             </div>
 
             <div class="control-group slider-group">
