@@ -7,7 +7,7 @@ let motionButtonEl, restartButtonEl, fullscreenButtonEl, bouncyBorderToggleEl;
 let circleButtonEl, squareButtonEl, triangleButtonEl;
 let p5Canvas; 
 
-let versionNumber = "0.52"; // Updated version
+let versionNumber = "0.53"; 
 let selectedShape = 'circle'; 
 let motionActive = false;
 const MAX_SHAPES = 100;
@@ -45,7 +45,7 @@ function setup() {
     frameRate(30);
     
     if (!setupControls()) { 
-        console.error("FATAL: setupControls() failed. Field may not appear or function correctly.");
+        console.error("FATAL: setupControls() failed due to missing HTML elements. Field may not appear or function correctly.");
     }
     
     windowResized(); 
@@ -80,7 +80,6 @@ function setupControls() {
     console.log("setupControls() called.");
     let allControlsFound = true;
 
-    // Get elements and check each one immediately
     motionButtonEl = document.getElementById('motionButton');
     if (!motionButtonEl) { console.error("HTML Control Error: Element with ID 'motionButton' not found."); allControlsFound = false; }
 
@@ -115,41 +114,33 @@ function setupControls() {
         return false; 
     }
     
-    // Initialize appSettings from HTML control values where appropriate, or set controls from appSettings
     gravitySliderEl.value = appSettings.gravity;
     lSystemSliderEl.value = appSettings.randomize;
     sizeSliderEl.value = appSettings.size;
     bouncyBorderToggleEl.checked = appSettings.bouncyBorder; 
 
-    // Update appSettings from the actual initial values of the controls IF they differ from defaults
     appSettings.gravity = parseFloat(gravitySliderEl.value);
     appSettings.randomize = parseFloat(lSystemSliderEl.value);
     appSettings.size = parseFloat(sizeSliderEl.value);
-    // appSettings.bouncyBorder is already set from its default or from checkbox if needed
 
     document.querySelectorAll('.controls input[type="range"]').forEach(slider => {
         updateSliderValueDisplay(slider);
         updateRangeSliderFill(slider); 
     });
     
-    // Event Listeners
     motionButtonEl.addEventListener('click', () => {
         motionActive = !motionActive;
-        motionButtonEl.innerHTML = motionActive ? 'Pause' : 'Play'; // TEXT CHANGE HERE
+        motionButtonEl.innerHTML = motionActive ? 'Pause' : 'Play'; 
     });
-    // Set initial text for motion button (HTML defaults to "Play")
-    motionButtonEl.innerHTML = motionActive ? 'Pause' : 'Play';
-
+    motionButtonEl.innerHTML = motionActive ? 'Pause' : 'Play'; // Set initial text
 
     restartButtonEl.addEventListener('click', () => {
         shapes = [];
-        // Reset to default values defined in appSettings initial state
         appSettings.gravity = 2.5; 
         appSettings.randomize = 0;   
         appSettings.size = 20;    
         appSettings.bouncyBorder = false; 
         
-        // Update HTML controls to reflect these defaults
         gravitySliderEl.value = appSettings.gravity;
         lSystemSliderEl.value = appSettings.randomize;
         sizeSliderEl.value = appSettings.size;
@@ -160,7 +151,7 @@ function setupControls() {
             updateRangeSliderFill(slider);
         });
         motionActive = false; 
-        motionButtonEl.innerHTML = 'Play'; // Ensure it resets to "Play"
+        motionButtonEl.innerHTML = 'Play'; 
         if (typeof background === 'function' && appSettings.backgroundColor) {
             background(appSettings.backgroundColor); 
         }
@@ -455,7 +446,7 @@ class Shape {
             const radius = this.size / 2; 
             if (this.x - radius < 0 && this.velX < 0) { 
                 this.x = radius;        
-                this.velX *= -1;        
+                this.velX *= -1; // Simple deflection       
             } else if (this.x + radius > width && this.velX > 0) { 
                 this.x = width - radius; 
                 this.velX *= -1;        
