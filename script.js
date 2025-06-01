@@ -1,316 +1,395 @@
+// Orbital Shapes - script.js (Refactored)
+
 let shapes = [];
-let gravitySlider, lSystemSlider, sizeSlider;
-let sliderContainer, buttonContainer, controlContainer;
-let versionNumber = "0.46"; // Updated version number
-let selectedShape = 'circle';
+// HTML Element References
+let gravitySliderEl, lSystemSliderEl, sizeSliderEl;
+let motionButtonEl, restartButtonEl, fullscreenButtonEl;
+let circleButtonEl, squareButtonEl, triangleButtonEl;
+let p5Canvas;
+
+let versionNumber = "0.47"; // Updated version
+let selectedShape = 'circle'; // Default selected shape
 let motionActive = false;
 const MAX_SHAPES = 100;
-let barHeight = 60;
 
-function setup() {
-    createCanvas(windowWidth, windowHeight);
-    frameRate(30);
-    background(0);
+// App-specific settings (mimicking Line Flow structure)
+const appSettings = {
+    backgroundColor: '#000000', // Canvas background for Orbital Shapes
+    // Initial values for sliders (can also be read from HTML value attributes)
+    gravity: 2.5,
+    randomize: 0,
+    size: 20,
+};
 
-    document.body.style.margin = "0";
-    document.body.style.overflow = "hidden";
-
-    controlContainer = createDiv('').style('position', 'absolute')
-        .style('bottom', '0')
-        .style('left', '0')
-        .style('width', '100%')
-        .style('height', barHeight + 'px')
-        .style('padding', '10px')
-        .style('background', '#888')
-        .style('display', 'flex')
-        .style('flex-wrap', 'wrap')
-        .style('justify-content', 'space-between')
-        .style('align-items', 'center')
-        .style('z-index', '10');
-
-    let leftControls = createDiv('').style('display', 'flex')
-        .style('gap', '10px')
-        .parent(controlContainer);
-
-    let motionButton = createButton('▶')
-        .mousePressed(() => {
-            motionActive = !motionActive;
-            motionButton.html(motionActive ? '⏸' : '▶');
-        })
-        .style('width', '60px')
-        .style('height', '60px')
-        .style('font-size', '48px')
-        .style('background', '#888')
-        .style('color', '#3fd16b')
-        .style('border', 'none')
-        .style('cursor', 'pointer')
-        .style('display', 'flex')
-        .style('justify-content', 'center')
-        .style('align-items', 'center')
-        .parent(leftControls);
-
-    let restartButton = createButton('⟳')
-        .mousePressed(() => {
-            shapes = [];
-            gravitySlider.value(2.5);
-            lSystemSlider.value(0);
-            sizeSlider.value(20);
-        })
-        .style('width', '60px')
-        .style('height', '60px')
-        .style('font-size', '48px')
-        .style('background', '#888')
-        .style('color', '#3fd16b')
-        .style('border', 'none')
-        .style('cursor', 'pointer')
-        .style('display', 'flex')
-        .style('justify-content', 'center')
-        .style('align-items', 'center')
-        .parent(leftControls);
-
-    sliderContainer = createDiv('').style('display', 'flex')
-        .style('gap', '10px')
-        .style('justify-content', 'center')
-        .style('align-items', 'center')
-        .parent(controlContainer);
-
-    function createLabeledSlider(labelText, min, max, defaultValue) {
-        let container = createDiv('').style('display', 'flex')
-            .style('flex-direction', 'column')
-            .style('align-items', 'center')
-            .parent(sliderContainer);
-        let slider = createSlider(min, max, defaultValue, 0.1)
-            .style('width', '150px')
-            .style('height', '20px')
-            .style('accent-color', '#3fd16b')
-            .parent(container);
-        createSpan(labelText).style('color', 'white')
-        .style('font-family', 'Arial')  // Set font to Arial
-        .parent(container);
-        return slider;
-    }
-
-    gravitySlider = createLabeledSlider('Gravity', 0, 5, 2.5);
-    lSystemSlider = createLabeledSlider('Randomize Movement', 0, 10, 0);
-    sizeSlider = createLabeledSlider('Size', 10, min(windowWidth, windowHeight) * 0.20, 20);
-
-    buttonContainer = createDiv('').style('display', 'flex')
-        .style('gap', '20px')
-        .style('margin-right', '20px')
-        .parent(controlContainer);
-
-    function createShapeButton(shapeType, clipPath) {
-        let button = createButton('')
-            .mousePressed(() => {
-                selectedShape = shapeType;
-                updateShapeButtonColors();
-            })
-            .style('width', '30px')
-            .style('height', '30px')
-            .style('background', '#000')
-            .style('border', 'none')
-            .style('clip-path', clipPath)
-            .parent(buttonContainer);
-        return button;
-    }
-
-    let circleButton = createShapeButton('circle', 'circle(50%)');
-    let squareButton = createShapeButton('square', 'none');
-    let triangleButton = createShapeButton('triangle', 'polygon(50% 0%, 0% 100%, 100% 100%)');
-
-    function updateShapeButtonColors() {
-        circleButton.style('background', selectedShape === 'circle' ? '#3fd16b' : '#000');
-        squareButton.style('background', selectedShape === 'square' ? '#3fd16b' : '#000');
-        triangleButton.style('background', selectedShape === 'triangle' ? '#3fd16b' : '#000');
-    }
-    updateShapeButtonColors();
-
-     let shapeLabel = createSpan("Select Shape")
-        .style('color', 'white')
-        .style('text-align', 'center')
-        .style('display', 'block')
-        .style('position', 'absolute')
-        .style('font-family', 'Arial')  // Set font to Arial
-        .parent(controlContainer);
-
-    setTimeout(() => {
-        shapeLabel.style('width', buttonContainer.elt.offsetWidth + 'px');
-        let labelX = buttonContainer.elt.offsetLeft + (buttonContainer.elt.offsetWidth - shapeLabel.elt.offsetWidth) / 2;
-        shapeLabel.style('left', labelX + 'px');
-        shapeLabel.style('top', controlContainer.elt.offsetHeight - shapeLabel.elt.offsetHeight + 'px');
-    }, 0);
-    
+// Helper to update the visual fill of range sliders
+function updateRangeSliderFill(inputElement) {
+    if (!inputElement) return;
+    const min = parseFloat(inputElement.min || 0);
+    const max = parseFloat(inputElement.max || 1);
+    const value = parseFloat(inputElement.value);
+    const percentage = ((value - min) / (max - min)) * 100;
+    inputElement.style.setProperty('--range-progress', `${percentage}%`);
 }
 
+function setup() {
+    const canvasPlaceholder = document.getElementById('p5-canvas-placeholder');
+    p5Canvas = createCanvas(1, 1); // Create a 1x1 canvas initially
+    p5Canvas.parent(canvasPlaceholder); // Parent it to the placeholder
+
+    frameRate(30);
+    // Background is drawn in windowResized and draw loop
+
+    setupControls(); // Initialize and get references to HTML controls
+    windowResized(); // Call to set initial canvas size and draw background
+}
+
+function setupControls() {
+    // Get button elements
+    motionButtonEl = document.getElementById('motionButton');
+    restartButtonEl = document.getElementById('restartButton');
+    fullscreenButtonEl = document.getElementById('fullscreenButton'); // Get fullscreen button
+
+    // Get slider elements
+    gravitySliderEl = document.getElementById('gravitySlider');
+    lSystemSliderEl = document.getElementById('lSystemSlider');
+    sizeSliderEl = document.getElementById('sizeSlider');
+
+    // Get shape selector button elements
+    circleButtonEl = document.getElementById('circleButton');
+    squareButtonEl = document.getElementById('squareButton');
+    triangleButtonEl = document.getElementById('triangleButton');
+
+    // Set initial values from appSettings (or could read from HTML value attributes)
+    gravitySliderEl.value = appSettings.gravity;
+    lSystemSliderEl.value = appSettings.randomize;
+    sizeSliderEl.value = appSettings.size;
+
+
+    // Update slider value displays and fill
+    document.querySelectorAll('.controls input[type="range"]').forEach(slider => {
+        updateSliderValueDisplay(slider);
+        updateRangeSliderFill(slider); // Initial fill
+    });
+    
+    // Add event listeners for buttons
+    motionButtonEl.addEventListener('click', () => {
+        motionActive = !motionActive;
+        motionButtonEl.innerHTML = motionActive ? '⏸' : '▶';
+    });
+
+    restartButtonEl.addEventListener('click', () => {
+        shapes = [];
+        // Reset sliders to default values (HTML and appSettings)
+        gravitySliderEl.value = 2.5; // Default gravity
+        lSystemSliderEl.value = 0;   // Default randomize
+        sizeSliderEl.value = 20;    // Default size
+        
+        appSettings.gravity = parseFloat(gravitySliderEl.value);
+        appSettings.randomize = parseFloat(lSystemSliderEl.value);
+        appSettings.size = parseFloat(sizeSliderEl.value);
+
+        document.querySelectorAll('.controls input[type="range"]').forEach(slider => {
+            updateSliderValueDisplay(slider);
+            updateRangeSliderFill(slider);
+        });
+        motionActive = false; // Optionally stop motion
+        motionButtonEl.innerHTML = '▶';
+        background(appSettings.backgroundColor); // Clear canvas
+    });
+
+    fullscreenButtonEl.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => console.error(`Error: ${err.message} (${err.name})`));
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+        }
+    });
+
+    // Add event listeners for sliders
+    gravitySliderEl.addEventListener('input', () => handleSliderInput(gravitySliderEl, 'gravity'));
+    lSystemSliderEl.addEventListener('input', () => handleSliderInput(lSystemSliderEl, 'randomize'));
+    sizeSliderEl.addEventListener('input', () => handleSliderInput(sizeSliderEl, 'size'));
+
+    // Add event listeners for shape selector buttons
+    circleButtonEl.addEventListener('click', () => selectShapeHandler('circle'));
+    squareButtonEl.addEventListener('click', () => selectShapeHandler('square'));
+    triangleButtonEl.addEventListener('click', () => selectShapeHandler('triangle'));
+
+    // Initialize active shape button style
+    updateShapeButtonVisuals();
+
+    // Display version number
+    const versionDisplayEl = document.getElementById('versionDisplay');
+    if(versionDisplayEl) versionDisplayEl.textContent = `Version: ${versionNumber}`;
+
+    // Fullscreen change listeners
+    ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(event =>
+        document.addEventListener(event, () => windowResized()) // Recalculate on any FS change
+    );
+}
+
+function handleSliderInput(sliderElement, settingName) {
+    appSettings[settingName] = parseFloat(sliderElement.value);
+    updateSliderValueDisplay(sliderElement);
+    updateRangeSliderFill(sliderElement);
+}
+
+function updateSliderValueDisplay(sliderElement) {
+    const valueDisplayId = sliderElement.id + '-value';
+    const valueDisplayElement = document.getElementById(valueDisplayId);
+    if (valueDisplayElement) {
+        valueDisplayElement.textContent = parseFloat(sliderElement.value).toFixed(sliderElement.step.includes('.') ? 1:0);
+    }
+}
+
+function selectShapeHandler(shapeType) {
+    selectedShape = shapeType;
+    updateShapeButtonVisuals();
+}
+
+function updateShapeButtonVisuals() {
+    const buttons = [
+        { el: circleButtonEl, shape: 'circle' },
+        { el: squareButtonEl, shape: 'square' },
+        { el: triangleButtonEl, shape: 'triangle' }
+    ];
+    buttons.forEach(item => {
+        if (item.el) { // Check if element exists
+            if (item.shape === selectedShape) {
+                item.el.classList.add('active-shape');
+                item.el.style.backgroundColor = 'var(--shape-active-color)';
+            } else {
+                item.el.classList.remove('active-shape');
+                item.el.style.backgroundColor = 'var(--shape-inactive-color)';
+            }
+        }
+    });
+}
+
+
 function draw() {
-    background(0, 20);
-    fill(255);
-    textSize(14);
-    text(`Version: ${versionNumber}`, 15, 20);
+    background(color(appSettings.backgroundColor + '33')); // Hex with alpha for trails (e.g., '33' for ~20% opacity)
 
     if (motionActive) {
         for (let i = shapes.length - 1; i >= 0; i--) {
             shapes[i].update();
             shapes[i].display();
-
             if (shapes[i].isOffScreen()) {
                 shapes.splice(i, 1);
             }
         }
     } else {
         for (let shape of shapes) {
-            shape.display();
+            shape.display(); // Display static shapes if motion is not active
         }
     }
 }
 
 function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-}
+    const mainTitle = document.getElementById('mainTitle');
+    const controlsPanel = document.getElementById('controlsPanel');
+    const sketchContainer = document.getElementById('sketch-container');
+    const siteFooter = document.getElementById('site-footer');
 
-let touchStartX, touchStartY; // Store initial touch position
+    let newCanvasWidth, newCanvasHeight;
+    const CANVAS_MARGIN_BOTTOM = 20; // As defined in CSS for canvas
 
-function touchStarted() {
-    if (touches.length > 0 && mouseY < height - barHeight) { // Check if it's within the canvas
-        touchStartX = touches[0].x;
-        touchStartY = touches[0].y;
-        return false; // Prevent default touch behavior (like scrolling) if needed
-    }
-}
+    if (document.fullscreenElement) {
+        document.body.classList.add('fullscreen-active');
+        newCanvasWidth = window.innerWidth;
+        newCanvasHeight = window.innerHeight;
+    } else {
+        document.body.classList.remove('fullscreen-active');
 
-function touchEnded() {
-    if (touches.length === 0 && touchStartX && touchStartY && mouseY < height - barHeight) { // Only trigger on release and within canvas
-        if (shapes.length >= MAX_SHAPES) {
-            shapes.shift();
+        newCanvasWidth = sketchContainer.clientWidth; // Uses the content width of sketchContainer
+
+        const titleStyle = mainTitle ? window.getComputedStyle(mainTitle) : {};
+        const titleHeight = mainTitle ? (mainTitle.offsetHeight + parseFloat(titleStyle.marginTop || 0) + parseFloat(titleStyle.marginBottom || 0)) : 0;
+        
+        const controlsPanelStyle = controlsPanel ? window.getComputedStyle(controlsPanel) : {};
+        const controlsHeight = controlsPanel ? (controlsPanel.offsetHeight + parseFloat(controlsPanelStyle.marginTop || 0) + parseFloat(controlsPanelStyle.marginBottom || 0)) : 0;
+        
+        const footerStyle = siteFooter ? window.getComputedStyle(siteFooter) : {};
+        const footerTotalHeight = siteFooter ? (siteFooter.offsetHeight + parseFloat(footerStyle.marginTop || 0) + parseFloat(footerStyle.marginBottom || 0)) : 0;
+
+        const bodyStyle = window.getComputedStyle(document.body);
+        const bodyVerticalPadding = parseFloat(bodyStyle.paddingTop || 0) + parseFloat(bodyStyle.paddingBottom || 0);
+        
+        let availableHeightForCanvasAndItsMargin = window.innerHeight - bodyVerticalPadding - titleHeight - controlsHeight - footerTotalHeight;
+        let maxCanvasHeight = availableHeightForCanvasAndItsMargin - CANVAS_MARGIN_BOTTOM;
+
+        // For Orbital shapes, let's aim for a 16:9 or fill available, rather than square like Line Flow
+        let desiredCanvasHeight = newCanvasWidth * (9/16); // Aspect ratio
+        
+        if (desiredCanvasHeight > maxCanvasHeight) {
+            desiredCanvasHeight = maxCanvasHeight; // Cap by available height
+             // Optionally adjust width to maintain aspect ratio if height is capped
+            // newCanvasWidth = desiredCanvasHeight * (16/9);
+            // newCanvasWidth = Math.min(newCanvasWidth, sketchContainer.clientWidth); // Ensure it doesn't exceed sketch container
         }
-        let s = new Shape(touchStartX, touchStartY, selectedShape); // Use initial touch position
-        shapes.push(s);
+        newCanvasHeight = desiredCanvasHeight;
+        
+        newCanvasWidth = Math.max(50, newCanvasWidth); 
+        newCanvasHeight = Math.max(50, newCanvasHeight);
 
-        touchStartX = null; // Reset for the next touch event
-        touchStartY = null;
+        // Dynamically update max for sizeSlider (optional, can be complex)
+        // let newMaxSize = Math.min(newCanvasWidth, newCanvasHeight) * 0.25;
+        // sizeSliderEl.max = Math.max(50, newMaxSize); // Ensure max is not too small
+        // if (parseFloat(sizeSliderEl.value) > parseFloat(sizeSliderEl.max)) {
+        //     sizeSliderEl.value = sizeSliderEl.max;
+        //     handleSliderInput(sizeSliderEl, 'size');
+        // }
+        // updateRangeSliderFill(sizeSliderEl); // Update fill if max changed
     }
+
+    resizeCanvas(newCanvasWidth, newCanvasHeight);
+    background(appSettings.backgroundColor); // Ensure full redraw of background
 }
+
 
 function mousePressed() {
-    if (mouseY < height - barHeight) {
+    // Check if the mouse is within the canvas bounds
+    if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
         if (shapes.length >= MAX_SHAPES) {
-            shapes.shift();
+            shapes.shift(); // Remove the oldest shape
         }
         let s = new Shape(mouseX, mouseY, selectedShape);
         shapes.push(s);
+        return false; // Prevent default browser action
     }
 }
 
+function touchStarted() {
+    if (touches.length > 0) {
+        const touchX = touches[0].x;
+        const touchY = touches[0].y;
+        // Check if the touch is within the canvas bounds
+        if (touchX > 0 && touchX < width && touchY > 0 && touchY < height) {
+            if (shapes.length >= MAX_SHAPES) {
+                shapes.shift();
+            }
+            let s = new Shape(touchX, touchY, selectedShape);
+            shapes.push(s);
+            return false; // Prevent default browser action (like scrolling)
+        }
+    }
+}
+// touchEnded is not strictly needed if spawning on touchStarted, unless you implement drag-to-spawn velocity.
+
+
+// Shape class - constructor and update methods need to use appSettings for slider values
 class Shape {
     constructor(x, y, type) {
         this.x = x;
         this.y = y;
         this.type = type;
-        this.size = sizeSlider.value();
+        this.size = appSettings.size; // Use appSettings.size
         this.updateMass();
         this.velX = random(-.5, .5);
         this.velY = random(-.5, .5);
-        this.color = color(random(255), random(255), random(255));
-        this.rotation = random(360);
-        this.rotationSpeed = random(-.1, .1);
+        this.color = color(random(150,255), random(150,255), random(150,255), 230); // Brighter, slightly transparent
+        this.rotation = random(TWO_PI); // Use TWO_PI for radians
+        this.rotationSpeed = random(-0.05, 0.05); // Slower rotation
     }
 
     updateMass() {
-        if (this.type === 'circle') {
-            this.mass = PI * (this.size / 2) * (this.size / 2);
-        } else if (this.type === 'square') {
-            this.mass = this.size * this.size;
+        // Simplified mass calculation for example
+        this.mass = (PI * this.size * this.size) / 1000; 
+        if (this.type === 'square') {
+            this.mass *= 1.2; // Squares slightly heavier
         } else if (this.type === 'triangle') {
-            this.mass = (this.size * this.size * sqrt(3) / 4);
+            this.mass *= 0.8; // Triangles slightly lighter
         }
-        this.mass /= 10; // Adjust mass scale as needed
     }
 
     update() {
-        // Gravitational pull based on size
+        // Gravitational pull
         for (let other of shapes) {
             if (other !== this) {
                 let dx = other.x - this.x;
                 let dy = other.y - this.y;
-                let distance = sqrt(dx * dx + dy * dy);
+                let distanceSq = dx * dx + dy * dy;
+                let distance = sqrt(distanceSq);
 
-                let minDistance = (this.size + other.size) / 2;
-                distance = max(distance, minDistance); // Prevent
-                let force = (gravitySlider.value() * this.mass * other.mass) / (distance * distance);
+                let minInteractionDistance = (this.size + other.size) / 20; // smaller interaction influence
+                distance = max(distance, minInteractionDistance); 
+                
+                let force = (appSettings.gravity * this.mass * other.mass) / (distance * distance); // Use appSettings.gravity
+                if (distance < (this.size + other.size) / 2) { // stronger force if overlapping (repulsion)
+                   force = -force * 0.5; // Make it repulsive if too close before collision logic
+                }
+
 
                 let angle = atan2(dy, dx);
-
                 let forceX = cos(angle) * force;
                 let forceY = sin(angle) * force;
 
                 this.velX += forceX / this.mass;
                 this.velY += forceY / this.mass;
-
-                other.velX -= forceX / other.mass; // Equal and opposite force
-                other.velY -= forceY / other.mass;
+                // No equal and opposite force here to simplify and make it more like a central puller for each
             }
         }
 
         // Randomize Movement
-        this.velX += (noise(this.x * 0.01, this.y * 0.01) - 0.5) * lSystemSlider.value() * 0.01;
-        this.velY += (noise(this.x * 0.01 + 100, this.y * 0.01 + 100) - 0.5) * lSystemSlider.value() * 0.01;
+        const noiseFactor = appSettings.randomize * 0.001; // Use appSettings.randomize
+        this.velX += (noise(this.x * 0.01, this.y * 0.01, frameCount * 0.01) - 0.5) * noiseFactor;
+        this.velY += (noise(this.x * 0.01 + 100, this.y * 0.01 + 100, frameCount * 0.01) - 0.5) * noiseFactor;
+
+        // Max speed
+        const maxSpeed = 5;
+        this.velX = constrain(this.velX, -maxSpeed, maxSpeed);
+        this.velY = constrain(this.velY, -maxSpeed, maxSpeed);
 
         this.x += this.velX;
         this.y += this.velY;
-
         this.rotation += this.rotationSpeed;
 
-        // Collision detection
+        // Collision detection and response
         for (let other of shapes) {
             if (other !== this) {
                 let dx = other.x - this.x;
                 let dy = other.y - this.y;
-                let distance = sqrt(dx * dx + dy * dy);
+                let distCenter = sqrt(dx * dx + dy * dy);
                 let minDist = (this.size + other.size) / 2;
-        
-                if (distance < minDist) {
-                    // Resolve overlap by moving objects apart
-                    let overlap = minDist - distance;
+
+                if (distCenter < minDist) {
+                    // Resolve overlap
+                    let overlap = (minDist - distCenter);
                     let angle = atan2(dy, dx);
-                    let separationX = cos(angle) * overlap * 0.5;
-                    let separationY = sin(angle) * overlap * 0.5;
-        
-                    this.x -= separationX;
-                    this.y -= separationY;
-                    other.x += separationX;
-                    other.y += separationY;
-        
-                    // Compute elastic collision response
-                    let nx = dx / distance;
-                    let ny = dy / distance;
-                    let relativeVelX = this.velX - other.velX;
-                    let relativeVelY = this.velY - other.velY;
-                    let velocityAlongNormal = relativeVelX * nx + relativeVelY * ny;
-        
-                    if (velocityAlongNormal > 0) continue; // Skip if already moving apart
-        
-                    let e = 1; // Coefficient of restitution (1 = perfectly elastic)
-                    let impulse = (-(1 + e) * velocityAlongNormal) / (this.mass + other.mass);
-                    let impulseX = impulse * nx;
-                    let impulseY = impulse * ny;
-        
-                    this.velX -= impulseX * other.mass;
-                    this.velY -= impulseY * other.mass;
-                    other.velX += impulseX * this.mass;
-                    other.velY += impulseY * this.mass;
+                    let moveX = cos(angle) * overlap * 0.5;
+                    let moveY = sin(angle) * overlap * 0.5;
+
+                    this.x -= moveX; this.y -= moveY;
+                    other.x += moveX; other.y += moveY;
+
+                    // Elastic collision response
+                    let normalX = dx / distCenter;
+                    let normalY = dy / distCenter;
+                    let relVelX = this.velX - other.velX;
+                    let relVelY = this.velY - other.velY;
+                    let velAlongNormal = relVelX * normalX + relVelY * normalY;
+
+                    if (velAlongNormal > 0) continue; // Objects are already moving apart
+
+                    let restitution = 0.85; // Slightly less than perfectly elastic
+                    let impulse = (-(1 + restitution) * velAlongNormal) / (1/this.mass + 1/other.mass); // Adjusted for mass
+
+                    this.velX += impulse * normalX / this.mass;
+                    this.velY += impulse * normalY / this.mass;
+                    other.velX -= impulse * normalX / other.mass;
+                    other.velY -= impulse * normalY / other.mass;
                 }
             }
         }
-        
     }
 
     isOffScreen() {
-        const margin = this.size * 2;
+        const margin = this.size * 2; // Increased margin for off-screen check
         return (
             this.x + margin < 0 ||
             this.x - margin > width ||
             this.y + margin < 0 ||
-            this.y - margin > height - barHeight
+            this.y - margin > height // Canvas height is the boundary now
         );
     }
 
@@ -320,19 +399,16 @@ class Shape {
         push();
         translate(this.x, this.y);
         rotate(this.rotation);
+        rectMode(CENTER); // Ensure rect mode is center for square
         if (this.type === 'circle') {
-            ellipse(0, 0, this.size);
+            ellipse(0, 0, this.size, this.size);
         } else if (this.type === 'square') {
-            rectMode(CENTER);
             rect(0, 0, this.size, this.size);
         } else if (this.type === 'triangle') {
-            triangle(0, -this.size / 2, -this.size / 2, this.size / 2, this.size / 2, this.size / 2);
+            // Equilateral triangle centered
+            let r = this.size / 2; // "Radius" for points
+            triangle(0, -r, -r * cos(PI/6), r * sin(PI/6), r * cos(PI/6), r * sin(PI/6));
         }
         pop();
     }
-}
-
-// Helper function to clamp values within a range (OUTSIDE the Shape class)
-function clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
 }
