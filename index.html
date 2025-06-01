@@ -7,17 +7,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* Line Flow Inspired Aesthetic */
             --page-bg: #ede3df; 
-            --text-on-page-bg: #3b4c1a; 
+            --text-on-page-bg: #3b4c1a; /* Line Flow's main green */
             
-            --control-panel-bg: rgba(60, 77, 25, 0.95); /* Slightly darker, richer green panel */
-            --text-on-control-panel: #f0f2f5; /* Very light, slightly cool text */
-            --control-accent-color: #4a5d23; /* Darker accent for inactive parts or borders */
-            --control-hover-color: #789040; /* Brighter hover for interactive elements */
+            /* Control Panel Theme - TO MATCH LINE FLOW */
+            --control-panel-bg: rgba(76, 97, 33, 0.9); /* EXACTLY Line Flow's panel color */
+            --text-on-control-panel: #f0f2f5; 
+            /* --control-accent-color is effectively --text-on-page-bg for active slider parts */
+            /* --control-hover-color is for general button hovers, can be distinct */
+            --control-hover-color: #678130; 
             
+            /* Shape Button Specific */
             --shape-button-active-bg: #a2b575; 
             --shape-button-hover-bg: #607434; 
 
+            /* Canvas */
             --canvas-bg-color: #000000; 
         }
 
@@ -29,7 +34,7 @@
             flex-direction: column; 
             align-items: center; 
             min-height: 100vh; 
-            padding-top: 15px; /* Reduced top padding */
+            padding-top: 15px; 
             padding-bottom: 5px; 
             box-sizing: border-box;
             font-family: 'Oswald', sans-serif;
@@ -38,12 +43,12 @@
 
         .main-title {
             font-weight: 700;
-            font-size: 2.6em; /* Slightly smaller */
+            font-size: 2.6em; 
             color: var(--text-on-page-bg); 
             margin-top: 0; 
-            margin-bottom: 20px; /* Reduced */
+            margin-bottom: 20px; 
             text-align: center;
-            letter-spacing: 1.5px; /* Reduced */
+            letter-spacing: 1.5px; 
             text-shadow: 1px 1px 2px rgba(0,0,0,0.05); 
             flex-shrink: 0; 
         }
@@ -53,21 +58,20 @@
             display: flex;
             flex-direction: column; 
             align-items: center; 
-            flex-grow: 1; /* This is key for pushing footer down */
-            padding-left: 15px; /* Reduced side padding */
+            flex-grow: 1; 
+            padding-left: 15px; 
             padding-right: 15px;
             box-sizing: border-box;
-            overflow: hidden; /* To contain the canvas if it tries to grow too large momentarily */
+            overflow: hidden; 
         }
 
         canvas {
             display: block; 
-            margin-bottom: 15px; /* Reduced */
-            border-radius: 8px; /* Softer radius */
+            margin-bottom: 15px; 
+            border-radius: 8px; 
             box-shadow: 0 5px 10px rgba(0,0,0,0.12); 
             max-width: 100%; 
-            /* height: auto; JS will set height */
-            flex-shrink: 0; /* Prevent canvas from shrinking when flex-grow is on parent */
+            flex-shrink: 0; 
             background-color: var(--canvas-bg-color); 
         }
 
@@ -91,17 +95,17 @@
             flex-wrap: wrap; 
             justify-content: space-around; 
             align-items: center; 
-            gap: 10px 15px; /* Reduced gap between groups */
-            background: var(--control-panel-bg);
-            border-radius: 10px; /* Softer radius */
-            padding: 8px 12px; /* Reduced padding */
+            gap: 10px 15px; 
+            background: var(--control-panel-bg); /* Updated to Line Flow panel color */
+            border-radius: 10px; 
+            padding: 8px 12px; 
             color: var(--text-on-control-panel);
             font-size: 14px; 
             box-shadow: 0 3px 8px rgba(0,0,0,0.2); 
             width: 100%; 
             box-sizing: border-box;
             flex-shrink: 0; 
-            margin-bottom: 8px; /* Reduced space below controls */
+            margin-bottom: 8px; 
         }
 
         .controls .control-group {
@@ -122,68 +126,71 @@
             color: var(--text-on-control-panel);
         }
 
-        /* SLIDERS */
+        /* SLIDERS - Updated to match Line Flow colors */
         .controls input[type="range"] {
-            width: 110px; /* Further reduced for compactness */
+            width: 110px; 
             -webkit-appearance: none; appearance: none;
             background: transparent; margin: 0;
             cursor: pointer;
         }
         .controls input[type="range"]::-webkit-slider-runnable-track {
-            width: 100%; height: 10px; /* Slightly thicker track */
+            width: 100%; height: 8px; /* Line Flow track height */
             background: linear-gradient(to right, 
-                var(--text-on-control-panel) var(--range-progress, 0%), /* Active part: light */
-                var(--control-accent-color) var(--range-progress, 0%)    /* Inactive part: dark accent */
+                var(--text-on-page-bg) var(--range-progress, 0%), /* Active: Line Flow Green (#3b4c1a) */
+                var(--page-bg) var(--range-progress, 0%)    /* Inactive: Line Flow Beige (#ede3df) */
             );
-            border-radius: 5px; 
+            border-radius: 4px; /* Line Flow track radius */
         }
         .controls input[type="range"]::-moz-range-track {
-            width: 100%; height: 10px;
+            width: 100%; height: 8px;
              background: linear-gradient(to right, 
-                var(--text-on-control-panel) var(--range-progress, 0%), 
-                var(--control-accent-color) var(--range-progress, 0%)
+                var(--text-on-page-bg) var(--range-progress, 0%), 
+                var(--page-bg) var(--range-progress, 0%)
             );
-            border-radius: 5px;
+            border-radius: 4px;
         }
         .controls input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none; appearance: none; 
-            border: 2px solid var(--control-accent-color); /* Border for thumb */
+            border: none; /* No border like Line Flow */
             width: 18px; height: 18px; border-radius: 50%;
-            background: var(--text-on-control-panel); 
-            margin-top: -4px; /* Adjust for thicker track */
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            background: var(--text-on-page-bg); /* Thumb: Line Flow Green (#3b4c1a) */
+            cursor: pointer; 
+            margin-top: -5px; /* To align with 8px track */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Shadow like Line Flow */
         }
         .controls input[type="range"]::-moz-range-thumb {
-            border: 2px solid var(--control-accent-color);
+            border: none;
             width: 18px; height: 18px; border-radius: 50%;
-            background: var(--text-on-control-panel);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            background: var(--text-on-page-bg);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        .controls input[type="range"]:hover::-webkit-slider-thumb { border-color: var(--control-hover-color); }
-        .controls input[type="range"]:hover::-moz-range-thumb { border-color: var(--control-hover-color); }
+        /* Hover for thumb can make it slightly lighter/darker if needed, or rely on track interaction */
+         .controls input[type="range"]:hover::-webkit-slider-thumb { background: var(--control-hover-color); } /* Using general hover */
+         .controls input[type="range"]:hover::-moz-range-thumb { background: var(--control-hover-color); }
 
 
         /* ACTION BUTTONS (Play, Reset, Fullscreen) */
         .controls .action-buttons button, 
         .controls button#fullscreenButton {
-            background: transparent; /* Transparent background */
+            background: transparent; 
             color: var(--text-on-control-panel);
-            border: 1px solid var(--text-on-control-panel); /* Light border */
+            border: 1px solid var(--text-on-control-panel); 
             border-radius: 5px;
             padding: 5px 10px;
-            box-shadow: none; /* Removed default shadow */
+            box-shadow: none; 
             transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
             font-weight: normal;
         }
         .controls .action-buttons button:hover, 
         .controls button#fullscreenButton:hover {
-            background: var(--text-on-control-panel); /* Light background on hover */
-            color: var(--control-panel-bg); /* Dark text on hover */
+            background: var(--text-on-control-panel); 
+            color: var(--control-panel-bg); /* Using panel bg for text to ensure contrast */
             border-color: var(--text-on-control-panel);
         }
         .controls .action-buttons button:active, 
         .controls button#fullscreenButton:active {
-            background: var(--shape-button-active-bg); /* Active green color */
+            background: var(--shape-button-active-bg); 
             color: var(--control-panel-bg);
             border-color: var(--shape-button-active-bg);
         }
@@ -204,31 +211,31 @@
         .controls .shape-selector { gap: 6px; }
         .controls .shape-button {
             width: 28px; height: 28px; 
-            background-color: var(--text-on-control-panel); /* SHAPE IS LIGHT */
-            border: none; /* NO BORDER on inactive shape buttons */
+            background-color: var(--text-on-control-panel); 
+            border: none; 
             cursor: pointer; margin: 0; padding: 0; 
             font-size: 0; 
             border-radius: 4px; 
             transition: background-color 0.2s ease, box-shadow 0.2s ease;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: inset 0 0 0 1px var(--control-accent-color); /* Subtle inset border */
+            box-shadow: inset 0 0 0 1px var(--text-on-page-bg); /* Subtle inset border using Line Flow Green */
         }
         .controls .shape-button:hover {
-            background-color: var(--shape-button-hover-bg); /* Darker green background on hover */
-            box-shadow: inset 0 0 0 1px var(--text-on-control-panel); /* Light inset border on hover */
+            background-color: var(--shape-button-hover-bg); 
+            box-shadow: inset 0 0 0 1px var(--text-on-control-panel); 
         }
         .controls .shape-button.active-shape {
-            background-color: var(--shape-button-active-bg); /* Active green fill */
-            box-shadow: inset 0 0 0 2px var(--text-on-control-panel), 0 0 4px var(--shape-button-active-bg); /* Prominent light inset border + glow */
+            background-color: var(--shape-button-active-bg); 
+            box-shadow: inset 0 0 0 2px var(--text-on-control-panel), 0 0 4px var(--shape-button-active-bg); 
         }
-        #circleButton { clip-path: circle(40% at 50% 50%); } /* Adjusted for no border */
+        #circleButton { clip-path: circle(40% at 50% 50%); } 
         #squareButton { clip-path: inset(18%); } 
         #triangleButton { clip-path: polygon(50% 20%, 20% 80%, 80% 80%); }
 
 
         #site-footer {
             width: 100%; text-align: center;
-            padding: 5px 15px; /* Minimal padding */
+            padding: 5px 15px; 
             font-size: 0.8em; color: var(--text-on-page-bg); 
             margin-top: auto; flex-shrink: 0; 
             box-sizing: border-box;
@@ -236,7 +243,7 @@
             justify-content: center;
             align-items: center;
             flex-wrap: wrap; 
-            gap: 4px 10px; /* Minimal gap */
+            gap: 4px 10px; 
         }
         #site-footer a { color: var(--text-on-page-bg); text-decoration: none; }
         #site-footer a:hover { text-decoration: underline; }
