@@ -16,7 +16,7 @@
             --control-hover-color: #678130; 
             
             --shape-button-active-bg: #a2b575; 
-            --shape-button-hover-bg: var(--page-bg); /* Use page beige for hover for contrast */
+            --shape-button-hover-bg: var(--page-bg); 
 
             --canvas-bg-color: #000000; 
         }
@@ -70,8 +70,7 @@
             background-color: var(--canvas-bg-color); 
         }
 
-        /* Fullscreen styles remain the same */
-        body.fullscreen-active { padding: 0 !important; overflow: hidden !important; background-color: var(--canvas-bg-color) !important; }
+        body.fullscreen-active { /* Styles as before */ }
         body.fullscreen-active .main-title,
         body.fullscreen-active .controls,
         body.fullscreen-active #site-footer { display: none !important; }
@@ -98,12 +97,13 @@
         }
 
         .controls .control-group {
-            display: flex;
-            flex-wrap: wrap; 
+            display: flex; /* Base for items within a group */
+            flex-wrap: wrap; /* Allow items (buttons, labels) to wrap if needed */
             gap: 8px 12px; 
-            justify-content: center;
+            justify-content: center; /* Center items like buttons in their row */
             align-items: center;
             padding: 4px 0; 
+            /* width: auto; Let groups size to content unless they need to stack */
         }
 
         .controls label {
@@ -125,12 +125,12 @@
         .controls input[type="range"]::-webkit-slider-runnable-track {
             width: 100%; height: 8px; 
             background: linear-gradient(to right, 
-                var(--text-on-page-bg) var(--range-progress, 0%), /* Active: Line Flow Green */
-                var(--page-bg) var(--range-progress, 0%)    /* Inactive: Line Flow Beige */
+                var(--text-on-page-bg) var(--range-progress, 0%), 
+                var(--page-bg) var(--range-progress, 0%)    
             );
             border-radius: 4px; 
         }
-        .controls input[type="range"]::-moz-range-track { /* Firefox */
+        .controls input[type="range"]::-moz-range-track { 
             width: 100%; height: 8px;
              background: linear-gradient(to right, 
                 var(--text-on-page-bg) var(--range-progress, 0%), 
@@ -142,12 +142,12 @@
             -webkit-appearance: none; appearance: none; 
             border: none; 
             width: 18px; height: 18px; border-radius: 50%;
-            background: var(--text-on-page-bg); /* Thumb: Line Flow Green */
+            background: var(--text-on-page-bg); 
             cursor: pointer; 
             margin-top: -5px; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
         }
-        .controls input[type="range"]::-moz-range-thumb { /* Firefox */
+        .controls input[type="range"]::-moz-range-thumb { 
             border: none;
             width: 18px; height: 18px; border-radius: 50%;
             background: var(--text-on-page-bg);
@@ -199,9 +199,9 @@
         .controls .shape-selector { gap: 6px; }
         .controls .shape-button {
             width: 28px; height: 28px; 
-            background-color: var(--text-on-control-panel); /* SHAPE IS LIGHT (button background) */
-            border: none; /* No border for inactive state to make clip-path shape clearer */
-            box-shadow: none; /* No shadow for inactive state */
+            background-color: var(--text-on-control-panel); 
+            border: none; 
+            box-shadow: none; 
             cursor: pointer; margin: 0; padding: 0; 
             font-size: 0; 
             border-radius: 4px; 
@@ -209,19 +209,16 @@
             display: flex; align-items: center; justify-content: center;
         }
         .controls .shape-button:hover {
-            background-color: var(--shape-button-hover-bg); /* Light beige on hover */
-             /* Optionally add a subtle border or shadow on hover if desired */
+            background-color: var(--shape-button-hover-bg); 
             box-shadow: 0 0 0 1px var(--text-on-control-panel);
         }
         .controls .shape-button.active-shape {
-            background-color: var(--shape-button-active-bg); /* Active green fill */
-            /* Prominent light outline/glow for active shape */
+            background-color: var(--shape-button-active-bg); 
             box-shadow: 0 0 0 2px var(--text-on-control-panel), 0 0 5px var(--text-on-control-panel); 
         }
-        /* Clip-paths define the visible shape of the button's background */
         #circleButton { clip-path: circle(42% at 50% 50%); }
-        #squareButton { clip-path: inset(18%); } /* Makes a smaller square */
-        #triangleButton { clip-path: polygon(50% 18%, 20% 82%, 80% 82%); } /* Adjusted for no border */
+        #squareButton { clip-path: inset(18%); } 
+        #triangleButton { clip-path: polygon(50% 18%, 20% 82%, 80% 82%); }
 
 
         #site-footer {
@@ -240,15 +237,47 @@
         #site-footer a:hover { text-decoration: underline; }
         #site-footer #versionDisplay { color: var(--text-on-page-bg); }
         
-        /* Media queries remain largely the same */
+        /* MEDIA QUERIES - Revised for Control Group stacking */
         @media (max-width: 600px) { 
             .main-title { font-size: 2em; margin-bottom: 15px; }
-            .controls { padding: 8px; gap: 8px; flex-direction: column; }
-            .controls .control-group { flex-direction: column; gap: 10px; padding: 8px 0;}
-            .controls label { width: 100%; max-width:260px; justify-content: space-between; margin: 0 auto;}
+            .controls { 
+                padding: 8px; 
+                gap: 10px; /* Gap between stacked groups */
+                flex-direction: column; /* Stack control groups */
+            }
+            
+            /* Default for control groups when controls are stacked */
+            .controls .control-group {
+                width: 100%; /* Make each group take full width */
+                padding: 6px 0; /* Adjust padding for stacked groups */
+                justify-content: center; /* Center content within the full-width group */
+            }
+
+            /* Slider group specifically stacks its label/input pairs */
+            .controls .control-group.slider-group {
+                flex-direction: column; /* Stack labels/sliders */
+                align-items: center; /* Center the stacked items */
+                gap: 12px; /* Gap between label/slider pairs */
+            }
+            .controls .control-group.slider-group label { 
+                width: 100%; 
+                max-width: 260px; 
+                justify-content: space-between; 
+                margin: 0 auto;
+            }
+
+            /* Button groups try to keep buttons in a row, centered */
+            .controls .control-group.action-buttons,
+            .controls .control-group.shape-selector {
+                flex-direction: row; /* Keep buttons side-by-side */
+                flex-wrap: wrap; /* Allow buttons to wrap if necessary */
+                justify-content: center; /* Center the buttons */
+            }
+
             .controls input[type="range"] { width: 120px; }
             #site-footer { font-size: 0.75em; }
         }
+
         @media (max-width: 420px) {
             .main-title { font-size: 1.7em; margin-bottom: 12px; }
             #sketch-container { padding-left: 10px; padding-right: 10px; }
