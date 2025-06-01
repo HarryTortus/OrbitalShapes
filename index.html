@@ -7,22 +7,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Line Flow Inspired Aesthetic */
             --page-bg: #ede3df; 
             --text-on-page-bg: #3b4c1a; 
             
-            /* Control Panel Theme (Dark Green) */
-            --control-panel-bg: rgba(76, 97, 33, 0.95); 
-            --text-on-control-panel: #e4e6eb; /* Brighter light text */
-            --control-accent-color: #526924; 
-            --control-hover-color: #678130; 
+            --control-panel-bg: rgba(60, 77, 25, 0.95); /* Slightly darker, richer green panel */
+            --text-on-control-panel: #f0f2f5; /* Very light, slightly cool text */
+            --control-accent-color: #4a5d23; /* Darker accent for inactive parts or borders */
+            --control-hover-color: #789040; /* Brighter hover for interactive elements */
             
-            /* Shape Button Specific */
-            /* Inactive shape will use --text-on-control-panel for its bg */
-            --shape-button-active-bg: #9eb067; /* Softer, distinct active green */
-            --shape-button-border-hover: #adc178; 
+            --shape-button-active-bg: #a2b575; 
+            --shape-button-hover-bg: #607434; 
 
-            /* Canvas */
             --canvas-bg-color: #000000; 
         }
 
@@ -34,7 +29,7 @@
             flex-direction: column; 
             align-items: center; 
             min-height: 100vh; 
-            padding-top: 20px; 
+            padding-top: 15px; /* Reduced top padding */
             padding-bottom: 5px; 
             box-sizing: border-box;
             font-family: 'Oswald', sans-serif;
@@ -43,12 +38,12 @@
 
         .main-title {
             font-weight: 700;
-            font-size: 2.8em;
+            font-size: 2.6em; /* Slightly smaller */
             color: var(--text-on-page-bg); 
             margin-top: 0; 
-            margin-bottom: 25px; 
+            margin-bottom: 20px; /* Reduced */
             text-align: center;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px; /* Reduced */
             text-shadow: 1px 1px 2px rgba(0,0,0,0.05); 
             flex-shrink: 0; 
         }
@@ -58,33 +53,28 @@
             display: flex;
             flex-direction: column; 
             align-items: center; 
-            flex-grow: 1; 
-            padding-left: 20px; 
-            padding-right: 20px;
+            flex-grow: 1; /* This is key for pushing footer down */
+            padding-left: 15px; /* Reduced side padding */
+            padding-right: 15px;
             box-sizing: border-box;
+            overflow: hidden; /* To contain the canvas if it tries to grow too large momentarily */
         }
 
         canvas {
             display: block; 
-            margin-bottom: 20px; 
-            border-radius: 10px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15); 
+            margin-bottom: 15px; /* Reduced */
+            border-radius: 8px; /* Softer radius */
+            box-shadow: 0 5px 10px rgba(0,0,0,0.12); 
             max-width: 100%; 
-            height: auto; 
-            flex-shrink: 0; 
+            /* height: auto; JS will set height */
+            flex-shrink: 0; /* Prevent canvas from shrinking when flex-grow is on parent */
             background-color: var(--canvas-bg-color); 
         }
 
-        body.fullscreen-active {
-            padding: 0 !important; 
-            overflow: hidden !important; 
-            background-color: var(--canvas-bg-color) !important;
-        }
+        body.fullscreen-active { /* Styles as before */ }
         body.fullscreen-active .main-title,
         body.fullscreen-active .controls,
-        body.fullscreen-active #site-footer { 
-            display: none !important; 
-        }
+        body.fullscreen-active #site-footer { display: none !important; }
         body.fullscreen-active #sketch-container {
             width: 100vw !important; height: 100vh !important; 
             max-width: none !important; padding: 0 !important; 
@@ -94,189 +84,184 @@
             box-shadow: none !important; 
         }
 
+
         .controls {
             display: flex;
-            flex-direction: row; /* Groups try to be in a row */
-            flex-wrap: wrap; /* Groups wrap if not enough space */
-            justify-content: space-around; /* Distribute groups */
-            align-items: center; /* Align groups vertically */
-            gap: 15px 20px; /* Gap between control groups */
+            flex-direction: row; 
+            flex-wrap: wrap; 
+            justify-content: space-around; 
+            align-items: center; 
+            gap: 10px 15px; /* Reduced gap between groups */
             background: var(--control-panel-bg);
-            border-radius: 12px;
-            padding: 10px 15px; /* Reduced padding for controls overall */
+            border-radius: 10px; /* Softer radius */
+            padding: 8px 12px; /* Reduced padding */
             color: var(--text-on-control-panel);
-            font-size: 14.5px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.25); 
+            font-size: 14px; 
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2); 
             width: 100%; 
             box-sizing: border-box;
             flex-shrink: 0; 
-            margin-bottom: 10px; /* Reduced space below controls */
+            margin-bottom: 8px; /* Reduced space below controls */
         }
 
         .controls .control-group {
             display: flex;
             flex-wrap: wrap; 
-            gap: 10px 15px; /* Gap between items within a group */
-            /* width: 100%; */ /* No longer full width, groups size to content */
+            gap: 8px 12px; 
             justify-content: center;
             align-items: center;
-            padding: 5px 0; /* Minimal padding for groups */
+            padding: 4px 0; 
         }
-
 
         .controls label {
             font-weight: normal; 
             display: flex;
             align-items: center;
             white-space: nowrap;
-            gap: 8px; /* Reduced gap */
+            gap: 6px; 
             color: var(--text-on-control-panel);
         }
+
+        /* SLIDERS */
         .controls input[type="range"] {
-            width: 120px; /* Slightly narrower */
+            width: 110px; /* Further reduced for compactness */
             -webkit-appearance: none; appearance: none;
             background: transparent; margin: 0;
+            cursor: pointer;
         }
-
         .controls input[type="range"]::-webkit-slider-runnable-track {
-            width: 100%; height: 8px;
-            background: linear-gradient(to right, var(--control-accent-color) var(--range-progress, 0%), 
-                                                 rgba(237, 227, 223, 0.35) var(--range-progress, 0%)); /* Adjusted track opacity */
-            border-radius: 4px; cursor: pointer;
+            width: 100%; height: 10px; /* Slightly thicker track */
+            background: linear-gradient(to right, 
+                var(--text-on-control-panel) var(--range-progress, 0%), /* Active part: light */
+                var(--control-accent-color) var(--range-progress, 0%)    /* Inactive part: dark accent */
+            );
+            border-radius: 5px; 
         }
         .controls input[type="range"]::-moz-range-track {
-            width: 100%; height: 8px;
-            background: linear-gradient(to right, var(--control-accent-color) var(--range-progress, 0%), 
-                                                 rgba(237, 227, 223, 0.35) var(--range-progress, 0%));
-            border-radius: 4px; cursor: pointer;
+            width: 100%; height: 10px;
+             background: linear-gradient(to right, 
+                var(--text-on-control-panel) var(--range-progress, 0%), 
+                var(--control-accent-color) var(--range-progress, 0%)
+            );
+            border-radius: 5px;
         }
         .controls input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none; border: none;
+            -webkit-appearance: none; appearance: none; 
+            border: 2px solid var(--control-accent-color); /* Border for thumb */
             width: 18px; height: 18px; border-radius: 50%;
             background: var(--text-on-control-panel); 
-            cursor: pointer; margin-top: -5px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            margin-top: -4px; /* Adjust for thicker track */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         .controls input[type="range"]::-moz-range-thumb {
-            border: none; width: 18px; height: 18px; border-radius: 50%;
-            background: var(--text-on-control-panel); cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            border: 2px solid var(--control-accent-color);
+            width: 18px; height: 18px; border-radius: 50%;
+            background: var(--text-on-control-panel);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
-        .controls input[type="range"]::-webkit-slider-thumb:hover { background: var(--control-hover-color); }
-        .controls input[type="range"]::-moz-range-thumb:hover { background: var(--control-hover-color); }
+        .controls input[type="range"]:hover::-webkit-slider-thumb { border-color: var(--control-hover-color); }
+        .controls input[type="range"]:hover::-moz-range-thumb { border-color: var(--control-hover-color); }
 
 
-        .controls button {
-            background: var(--control-accent-color); 
+        /* ACTION BUTTONS (Play, Reset, Fullscreen) */
+        .controls .action-buttons button, 
+        .controls button#fullscreenButton {
+            background: transparent; /* Transparent background */
             color: var(--text-on-control-panel);
-            border: 1px solid var(--control-hover-color); 
-            border-radius: 6px;
-            padding: 7px 15px; 
-            font-size: 1em; 
-            cursor: pointer; font-weight: bold;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
+            border: 1px solid var(--text-on-control-panel); /* Light border */
+            border-radius: 5px;
+            padding: 5px 10px;
+            box-shadow: none; /* Removed default shadow */
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+            font-weight: normal;
         }
-        .controls button:hover { 
-            background: var(--control-hover-color);
+        .controls .action-buttons button:hover, 
+        .controls button#fullscreenButton:hover {
+            background: var(--text-on-control-panel); /* Light background on hover */
+            color: var(--control-panel-bg); /* Dark text on hover */
             border-color: var(--text-on-control-panel);
         }
-        
-        .controls .action-buttons button {
-             font-size: 1.6em; 
-             padding: 4px 10px;
-             min-width: 45px;
+        .controls .action-buttons button:active, 
+        .controls button#fullscreenButton:active {
+            background: var(--shape-button-active-bg); /* Active green color */
+            color: var(--control-panel-bg);
+            border-color: var(--shape-button-active-bg);
         }
-        .controls button#fullscreenButton { 
-            font-size: 0.9em; 
-            padding: 8px 12px;
-        }
+        .controls .action-buttons button { font-size: 1.5em; padding: 2px 8px; min-width: 40px; }
+        .controls button#fullscreenButton { font-size: 0.85em; padding: 6px 10px; font-weight: bold; }
 
         .value-display {
-            display: inline-block; min-width: 28px; 
-            text-align: right; margin-left: 4px;
-            padding: 2px 4px;
-            border-radius: 4px;
-            font-size: 0.95em; 
+            display: inline-block; min-width: 25px; 
+            text-align: right; margin-left: 3px;
+            padding: 1px 3px;
+            border-radius: 3px;
+            font-size: 0.9em; 
             color: var(--text-on-control-panel);
-            font-weight: bold;
+            font-weight: normal;
         }
         
-        .controls .shape-selector {
-            gap: 8px; /* Gap for shape buttons */
-        }
+        /* SHAPE BUTTONS */
+        .controls .shape-selector { gap: 6px; }
         .controls .shape-button {
-            width: 30px; height: 30px; /* Slightly smaller for tighter fit */
-            background-color: var(--text-on-control-panel); /* LIGHT background for the button itself */
-            border: 2px solid var(--control-accent-color); /* DARKER GREEN border */
+            width: 28px; height: 28px; 
+            background-color: var(--text-on-control-panel); /* SHAPE IS LIGHT */
+            border: none; /* NO BORDER on inactive shape buttons */
             cursor: pointer; margin: 0; padding: 0; 
             font-size: 0; 
-            border-radius: 5px; 
-            transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 4px; 
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
             display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 0 1px var(--control-accent-color); /* Subtle inset border */
         }
         .controls .shape-button:hover {
-            border-color: var(--shape-button-border-hover); /* Highlight border on hover */
+            background-color: var(--shape-button-hover-bg); /* Darker green background on hover */
+            box-shadow: inset 0 0 0 1px var(--text-on-control-panel); /* Light inset border on hover */
         }
         .controls .shape-button.active-shape {
-            background-color: var(--shape-button-active-bg); /* Active shape's fill color */
-            border-color: var(--text-on-control-panel); /* Light border for active */
-            box-shadow: 0 0 5px 1px var(--shape-button-active-bg); /* Softer glow */
+            background-color: var(--shape-button-active-bg); /* Active green fill */
+            box-shadow: inset 0 0 0 2px var(--text-on-control-panel), 0 0 4px var(--shape-button-active-bg); /* Prominent light inset border + glow */
         }
-        /* Clip-paths define the visible shape of the button's background */
-        #circleButton { clip-path: circle(42% at 50% 50%); }
-        #squareButton { clip-path: inset(16%); } 
-        #triangleButton { clip-path: polygon(50% 16%, 18% 84%, 82% 84%); }
+        #circleButton { clip-path: circle(40% at 50% 50%); } /* Adjusted for no border */
+        #squareButton { clip-path: inset(18%); } 
+        #triangleButton { clip-path: polygon(50% 20%, 20% 80%, 80% 80%); }
 
 
         #site-footer {
             width: 100%; text-align: center;
-            padding: 6px 15px; /* Further reduced padding */
-            font-size: 0.85em; color: var(--text-on-page-bg); 
+            padding: 5px 15px; /* Minimal padding */
+            font-size: 0.8em; color: var(--text-on-page-bg); 
             margin-top: auto; flex-shrink: 0; 
             box-sizing: border-box;
             display: flex; 
             justify-content: center;
             align-items: center;
             flex-wrap: wrap; 
-            gap: 5px 15px; 
+            gap: 4px 10px; /* Minimal gap */
         }
-        #site-footer a { 
-            color: var(--text-on-page-bg); 
-            text-decoration: none; 
-        }
+        #site-footer a { color: var(--text-on-page-bg); text-decoration: none; }
         #site-footer a:hover { text-decoration: underline; }
-        #site-footer #versionDisplay { 
-             color: var(--text-on-page-bg);
-        }
+        #site-footer #versionDisplay { color: var(--text-on-page-bg); }
         
-        @media (max-width: 768px) { /* Adjusted breakpoint for control wrapping */
-            .controls {
-                /* Groups will wrap naturally if they don't fit */
-            }
-        }
-
         @media (max-width: 600px) { 
-            .main-title { font-size: 2.2em; margin-bottom: 20px; }
-            .controls { padding: 10px; gap: 10px; /* Reduce gap when stacked */ flex-direction: column; /* Stack groups on smaller screens explicitly */ }
-            .controls .control-group { flex-direction: column; gap: 12px; padding: 10px 0;}
-            .controls label { width: 100%; max-width:280px; justify-content: space-between; margin: 0 auto;}
-            .controls input[type="range"] { width: 130px; }
-             #site-footer { font-size: 0.8em; }
+            .main-title { font-size: 2em; margin-bottom: 15px; }
+            .controls { padding: 8px; gap: 8px; flex-direction: column; }
+            .controls .control-group { flex-direction: column; gap: 10px; padding: 8px 0;}
+            .controls label { width: 100%; max-width:260px; justify-content: space-between; margin: 0 auto;}
+            .controls input[type="range"] { width: 120px; }
+            #site-footer { font-size: 0.75em; }
         }
         @media (max-width: 420px) {
-            .main-title { font-size: 1.8em; margin-bottom: 15px; }
+            .main-title { font-size: 1.7em; margin-bottom: 12px; }
             #sketch-container { padding-left: 10px; padding-right: 10px; }
-            .controls input[type="range"] { width: 110px; }
-            .controls .action-buttons button { font-size: 1.4em; }
-            .controls .shape-button { width: 28px; height: 28px; }
-            #circleButton { clip-path: circle(40% at 50% 50%); }
-            #squareButton { clip-path: inset(18%); } 
-            #triangleButton { clip-path: polygon(50% 18%, 20% 80%, 80% 80%); }
+            .controls input[type="range"] { width: 100px; }
+            .controls .action-buttons button { font-size: 1.3em; }
+            .controls .shape-button { width: 26px; height: 26px; }
         }
 
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <script src="script.js" defer></script> </head>
+    <script src="script.js" defer></script>
+</head>
 <body>
     <h1 class="main-title" id="mainTitle">ORBITAL SHAPES</h1>
     <div id="sketch-container">
@@ -305,7 +290,8 @@
             </div>
 
             <div class="control-group shape-selector">
-                <label style="margin-right:5px;">Shape: </label> <button id="circleButton" class="shape-button" data-shape="circle" title="Circle"></button>
+                <label style="margin-right:5px;">Shape: </label>
+                <button id="circleButton" class="shape-button" data-shape="circle" title="Circle"></button>
                 <button id="squareButton" class="shape-button" data-shape="square" title="Square"></button>
                 <button id="triangleButton" class="shape-button" data-shape="triangle" title="Triangle"></button>
             </div>
